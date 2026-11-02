@@ -21,6 +21,12 @@
   <img src="https://img.shields.io/badge/Tests-61%20Unit%20%26%20Regression%20Suites%20%7C%2017%20Rust%20%7C%2010%2F10%20Corpus-3fb950" alt="61 Unit & Regression Suites | 17 Rust Supervisor Tests | 10/10 Corpus Gate" />
 </p>
 
+<!-- NEW BADGES: The "Hire Me" Section -->
+<p align="center">
+  <a href="https://www.linkedin.com/in/ayush-sharma-swe/"><img src="https://img.shields.io/badge/Status-Open_to_Work-brightgreen?style=for-the-badge&logo=linkedin" alt="Hire Me" /></a>
+  <a href="mailto:ayush.sharma.sys@gmail.com"><img src="https://img.shields.io/badge/Email-ayush.sharma.sys@gmail.com-red?style=for-the-badge&logo=gmail" alt="Email Me" /></a>
+</p>
+
 <p align="center">
   <a href="https://github.com/avengersvstheflash/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe">
     <img src="https://img.shields.io/badge/⚡_Download_Omnitome_v1.1.0-Windows_x64_(1.95_GB)-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Omnitome v1.1.0 for Windows" />
@@ -785,6 +791,22 @@ If you utilize Omnitome's architecture, loss-bounded semantic compression contra
   version = {1.1.0}
 }
 ```
+
+---
+
+## 👨💻 About the Developer & Availability
+
+**Ayush Sharma** — *AI Systems Engineer & Full-Stack Developer*
+
+I am the creator and lead architect of Omnitome. I specialize in bridging the gap between cutting-edge AI research (local LLMs, PyTorch, RAG pipelines) and production-grade desktop/web applications.
+
+**I am currently available for freelance and remote contract work.** If your team needs to:
+- Build a **Local-First AI Pipeline** (Ollama, LM Studio, PyTorch) to keep sensitive data offline.
+- Architect **RAG systems** with deterministic provenance and vector search (BGE-M3, SQLite).
+- Package complex AI applications into **Tauri or Electron desktop apps** for Windows/macOS.
+- Optimize GPU/VRAM performance for edge devices.
+
+**Let's talk:** [Connect with me on LinkedIn](https://www.linkedin.com/in/ayush-sharma-swe/) • [Email Me](mailto:ayush.sharma.sys@gmail.com)
 
 ---
 
