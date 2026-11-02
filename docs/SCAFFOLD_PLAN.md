@@ -1,5 +1,10 @@
 # Scaffold Plan: Frontend React Migration
 
+> [!NOTE] **Completed Historical Milestone**  
+> This specification documents the initial scaffolding and setup executed during Phase 1 of the React 18, TypeScript, and Vite migration. The active, production-grade frontend contract is codified in `docs/FRONTEND_BLUEPRINT_SPEC.md`.
+
+---
+
 ## 1. `frontend/` File Tree
 
 ```

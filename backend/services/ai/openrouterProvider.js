@@ -121,8 +121,8 @@ Instructions:
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/avengersvstheflash/Smart-Reader',
-          'X-OpenRouter-Title': 'Smart Reader',
+          'HTTP-Referer': 'https://github.com/ayumu-ml/Omnitome',
+          'X-OpenRouter-Title': 'Omnitome',
         },
         signal: controller.signal,
         body: JSON.stringify({

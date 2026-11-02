@@ -9,7 +9,7 @@
 
 ## Where the project is right now
 
-**Repo:** https://github.com/avengersvstheflash/Omnitome
+**Repo:** https://github.com/ayumu-ml/Omnitome
 **Release:** `v1.1.0 Stable`
 **HEAD:** (check with `git log -1 --oneline`)
 **Test suite:** 61 Unit & Regression Suites | 17 Rust Supervisor Tests | 10/10 Corpus Gate (plus 90 procedural audio stems verified). Verify with `npm test`, `cargo test --manifest-path src-tauri/Cargo.toml`, and `npm run sounds:test`.

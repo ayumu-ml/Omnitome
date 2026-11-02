@@ -1,5 +1,8 @@
 # Session Retrospective: Document Structure Engine & Reading Segments
 
+> [!NOTE] **Completed Historical Milestone**  
+> This retrospective records the closure of early development milestones Build 3B (v0.3b.1.9) and Build 4.3 from September 2026. For active project state, refer to `docs/SESSION_HANDOFF.md` and `docs/BENCHMARKS.md`.
+
 **Date:** 2026-09-15  
 **Milestone:** Build 3B.1.9 & Build 4.3  
 

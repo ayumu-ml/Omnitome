@@ -1,9 +1,9 @@
 # Design Specification: Tauri Packaging (Series 4 / Phase 6)
 
-> **Status:** Draft v1.0 — pre-implementation  
-> **Baseline:** HEAD 9a46973 (Series 3 closed)  
-> **Target:** v1.0 Windows-only desktop application  
-> **Estimated sessions:** 5–8 (S11–S15)  
+> **Status:** Implemented & Shipped (`v1.0.0` – `v1.1.0 Stable`)  
+> **Container:** Tauri v2 desktop shell with Rust supervisor & NSIS installer  
+> **Target:** Windows x64 standalone installer (`Omnitome_1.1.0_x64-setup.exe`)  
+> **Verification:** 17 Rust Cargo tests pass (`cargo test --manifest-path src-tauri/Cargo.toml`)  
 
 ---
 

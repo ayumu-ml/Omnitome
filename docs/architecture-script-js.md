@@ -1,4 +1,9 @@
-# Architecture Report: `src/script.js`
+# Historical Architecture Report: `src/script.js` (Legacy Pre-React Prototype)
+
+> [!NOTE] **Historical Archival Reference**  
+> This document records the pre-v1.0 vanilla JavaScript state and API client audit conducted prior to the React 18, Vite, and Zustand migration (Phases 1–3.5). It is preserved for historical provenance and architectural continuity. For the active production architecture, refer to `docs/ARCHITECTURE.md` and `docs/FRONTEND_BLUEPRINT_SPEC.md`.
+
+---
 
 ## 1. Global and module-scope state
 

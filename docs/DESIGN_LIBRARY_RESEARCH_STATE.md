@@ -1,12 +1,11 @@
 # F52 — Library / Research State Coordination Architecture
 ## Comprehensive Design Specification: Option A (Coordination Layer)
 
-> **Document Version:** 1.0.0  
-> **Status:** PROPOSED (Awaiting User Review)  
-> **Target Release:** Omnitome v0.7.0  
+> **Document Version:** 1.1.0  
+> **Status:** Implemented & Shipped (`v1.0.0` & `v1.1.0 Stable`)  
 > **Author:** Antigravity / Core Architecture  
-> **Scope:** Architectural Design Document (No Implementation Code, No Migration SQL, No Frontend Code)  
-> **Prerequisites:** Ingestion Pipeline (F51 Series), Persistent Import Queue (F58), Corpus Release Gate (F42)  
+> **Scope:** Authoritative Lifecycle, Deletion Semantics & Provenance Coordination Contract  
+> **Verification:** Passed all F52 test suites (`f52_schema_and_lifecycle_test.js`, `f52_endpoints_test.js`, `f52_delete_resynthesis_recovery_test.js`)  
 
 ---
 

@@ -1,10 +1,9 @@
 # Omnitome Architecture Specification: Local Neural Text-to-Speech (Phase 5.9 — Kokoro TTS)
 
-> **Document Status:** Complete Design Specification (v1.0)  
-> **Phase:** 5.9 (Series 3 — Pre-Packaging Feature Arc)  
-> **Target Branch / Baseline:** HEAD `27e33c6` + `ceb47e3` (Origin `main`)  
-> **Target Delivery:** 3 Sessions (S07: Backend/Sidecar, S08: Reader UI, S09: Settings/Polish)  
-> **Author:** Antigravity Pair Programmer (for Omnitome Core Engine)
+> **Document Status:** Implemented & Shipped (`v1.0.0` – `v1.1.0 Stable`)  
+> **Model:** Kokoro-82M v0.19 (Apache 2.0) via PyTorch FP16 CUDA sidecar (`127.0.0.1:8765`)  
+> **Features:** Dual-deck lookahead audio player, sentence-level tracking, gapless Web Audio context, ducking SFX  
+> **Verification:** Passed 10/10 pipeline tests (`node backend/tests/f85_kokoro_tts_sidecar_test.js`)
 
 ---
 

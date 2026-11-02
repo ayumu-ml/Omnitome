@@ -1095,7 +1095,7 @@ The team's development practice combines product iteration with evidence-driven 
 
 The following public project materials were consulted during preparation. Repository contents and file paths may evolve after this edition.
 
-- Omnitome repository: <https://github.com/avengersvstheflash/Omnitome>
+- Omnitome repository: <https://github.com/ayumu-ml/Omnitome>
 - `README.md`: product identity, feature summary, architecture overview, release status.
 - `docs/ARCHITECTURE.md`: Two-Representation Invariant, process boundaries, data lifecycle, ingestion and retrieval topology.
 - `docs/FEATURES.md`: supported ingestion formats, synthesis range, provenance behavior, Kokoro TTS, themes, and procedural audio.

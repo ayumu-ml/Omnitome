@@ -1026,7 +1026,7 @@ These recipes share one principle: keep the source available, make one decision 
 
 ## Appendix C. Technical Reference and Official Provider Guides
 
-The application-specific facts in this guide are grounded in the Omnitome repository and the session handoff current to 22 October 2026. For implementation detail, see the public repository's [`README.md`](https://github.com/avengersvstheflash/Omnitome), [`docs/FEATURES.md`](https://github.com/avengersvstheflash/Omnitome/blob/main/docs/FEATURES.md), [`docs/ARCHITECTURE.md`](https://github.com/avengersvstheflash/Omnitome/blob/main/docs/ARCHITECTURE.md), and [`docs/SESSION_HANDOFF.md`](https://github.com/avengersvstheflash/Omnitome/blob/main/docs/SESSION_HANDOFF.md). The handoff records the v1.0.2 release state and recent packaging, audio, onboarding, and test work. Consult the live repository for changes made after this edition.
+The application-specific facts in this guide are grounded in the Omnitome repository and the session handoff current to 22 October 2026. For implementation detail, see the public repository's [`README.md`](https://github.com/ayumu-ml/Omnitome), [`docs/FEATURES.md`](https://github.com/ayumu-ml/Omnitome/blob/main/docs/FEATURES.md), [`docs/ARCHITECTURE.md`](https://github.com/ayumu-ml/Omnitome/blob/main/docs/ARCHITECTURE.md), and [`docs/SESSION_HANDOFF.md`](https://github.com/ayumu-ml/Omnitome/blob/main/docs/SESSION_HANDOFF.md). The handoff records the v1.0.2 release state and recent packaging, audio, onboarding, and test work. Consult the live repository for changes made after this edition.
 
 For provider setup, use official documentation as the live reference because interfaces and model catalogues evolve:
 

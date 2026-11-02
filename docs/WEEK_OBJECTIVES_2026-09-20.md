@@ -1,8 +1,11 @@
 # Week Objectives — 2026-09-20 to 2026-09-26
 
+> [!NOTE] **Completed Historical Milestone**  
+> This document records the engineering objectives for the post-Phase 4 sprint (September 2026). All listed objectives (cinematic import progress, real-time stage monitoring, and responsive library states) were achieved and codified in the v1.0 and v1.1.0 releases. For active roadmap priorities, refer to `docs/SESSION_HANDOFF.md` and `docs/BENCHMARKS.md`.
+
 > **Scope.** This is the working plan for the week following Phase 4
 > completion. Every item below serves one goal: make the primary
-> Smart Reader experience feel like a real library of the user's own
+> Omnitome experience feel like a real library of the user's own
 > content, with processing that feels alive.
 
 ---

@@ -1,8 +1,11 @@
 # SMART READER — ARCHITECTURAL RECONNAISSANCE & PIPELINE AUDIT REPORT
 
+> [!NOTE] **Historical Archival Baseline**  
+> This report records the initial architectural audit of early Smart Reader prototypes from early development. It is preserved for historical baseline reference. For the production Omnitome architecture, multi-process topology, and F65 await barrier, refer to `docs/ARCHITECTURE.md`.
+
 **Date:** March 2025  
 **Role:** Senior Systems Architect  
-**Status:** Read-Only Architectural Inspection (No modifications made to codebase)  
+**Status:** Read-Only Architectural Inspection (Archived Baseline)  
 **Target File:** `docs/ARCHITECTURE_AUDIT.md`  
 
 ---

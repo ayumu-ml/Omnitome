@@ -1,6 +1,10 @@
 # Design: Chat-Log Parsing (F24)
 
-## Problem Statement
+> **Status:** Implemented & Shipped (`v1.0.0` & `v1.1.0 Stable`)  
+> **Module:** `backend/services/ingestion/chatLogDetector.js` & `backend/services/ingestion/parsers/chatLogParser.js`  
+> **Verification:** Passed test suite `phase5_8_0j_chatlog_detect_test.js` and corpus fixture `chat_11-slice.md`  
+
+---
 
 When users import PDFs containing exported chat conversations (e.g., Gemini interactions, ChatGPT conversations, or generated study notes), the standard book parser fails structurally. The parser mistakes repeated conversational phrases or prompt instructions (such as "Check your answer", "User:", or "Model:") for standard chapter headings. This leads to severe segmentation errors, wildly inaccurate table of contents generation, and dropped content during downstream LLM synthesis (e.g., only 2 out of 3 generated chapters synthesize successfully, leaving large gaps in the ingested material).
 

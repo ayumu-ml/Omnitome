@@ -1,8 +1,10 @@
 # Design Specification: UI Batch B (BookDetails & Persistent Import Dock)
 
-**Date**: 2026-10-14  
-**Scope**: F78 (Right-side Import Dock), F82 (Chapter Synthesis Hero Control), F79a (Supporting Materials Cleanup), F80 (Visual Metadata Blocks).  
-**Status**: Design Sketch for Decision (Docs & Mocks Only).
+> **Status:** Implemented & Shipped (`v1.1.0 Stable`)  
+> **Scope:** F78 (Right-side Import Dock / Drawer with auto-collapse & hover immunity), F82 (Chapter Synthesis Hero Control), F79a (Supporting Materials Cleanup), F80 (Visual Metadata Blocks)  
+> **Commits:** `6c723a3`, `f7fc932`, `8a9eab2`  
+
+---
 
 ---
 

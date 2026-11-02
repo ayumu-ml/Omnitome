@@ -1,9 +1,9 @@
 # Design: Dossier Foundation
 
-> **Status:** Draft — approved for implementation planning, decisions still open
-> **Findings:** Elevates Dossier to a first-class entity (Path B)
-> **Target:** Phase 5.8f/g (post-5.8d background tracking)
-> **Prefix convention:** `/api/*` — matches existing surface. No API version bump in this phase.
+> [!NOTE] **Forward-Looking Architecture Specification (Post-v1.1.0 / v1.2+ Roadmap)**  
+> **Status:** Architecture Design Proposal (1:1 foundation active via F58.1 & F79b; full 1:N multi-source dossier hierarchy planned for v1.2+)  
+> **Target:** Post-v1.1.0 Core Evolution  
+> **Prefix convention:** `/api/*` — matches existing REST API surface.
 
 ---
 

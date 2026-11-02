@@ -1,7 +1,7 @@
 # Omnitome — Session Handoff
 
 > Last updated: 2026-10-24 (Post-v1.1.0 Release: Desktop Packaging, Neural TTS, Welcome Wizard, Synthetic Archive & Oct 24 Bug Bash)  
-> Repository: github.com/avengersvstheflash/Omnitome  
+> Repository: github.com/ayumu-ml/Omnitome  
 > Purpose: Full orientation in one turn for any incoming assistant or engineer.
 
 ---

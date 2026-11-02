@@ -1,8 +1,9 @@
 # Omni Per-Theme Accent System
 
-> Design document for Phase 5.8c.1
-> Status: DRAFT — implementation 2026-10-06
-> Predecessor: DESIGN_OMNI_THEME.md
+> [!NOTE] **Historical Archival Design Document (Phase 5.8c.1)**  
+> This document records the early Phase 5.8c.1 draft for accent contrast tokens. It was superseded by the production 5-theme palette (`omni`, `sakura`, `spring`, `coffee`, `cyberpunk`) and 90-stem procedural audio engine codified in `docs/DESIGN_OMNI_THEME.md` and `frontend/src/styles/themes/`.
+
+---
 
 ## 1. Problem
 The omni theme uses neon violet (#A855F7) which works on dark backgrounds

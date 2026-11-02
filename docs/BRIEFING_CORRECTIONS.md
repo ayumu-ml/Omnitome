@@ -1,5 +1,8 @@
 # Briefing Corrections
 
+> [!NOTE] **Historical Briefing Drift Resolution**  
+> This document records and corrects drift from an early September 2026 repository report. All listed items (flat route patterns `/read/:bookId/:chapterId`, glass theme integration, 61 unit test suites, local BGE-M3 1024d vectorization, and PUT chapter routes) have been canonically resolved in the v1.0 and v1.1.0 releases. For active architecture and invariants, refer to `AGENTS.md` and `docs/SESSION_HANDOFF.md`.
+
 > **Purpose.** A fresh chat's "Repository Report" (dated 2026-09-19) contained
 > several inaccurate claims. This document corrects them against verified
 > repo state, so future agents don't propagate the drift. Read alongside

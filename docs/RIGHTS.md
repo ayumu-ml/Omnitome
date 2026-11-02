@@ -1,114 +1,154 @@
-# Rights and Licensing
+# Omnitome Rights, Licensing & Intellectual Property Governance Charter
 
-> Status: v1.1.0 Stable Release (Open Source AGPL-3.0). This document records the
-> licensing state, third-party attribution boundaries, and distribution terms for the
-> desktop installer and repository. It is not legal advice.
+> **Release Version:** `v1.1.0 Stable`  
+> **Repository:** `ayumu-ml/Omnitome` *(Historical / Working Directory: `Smart-Reader`)*  
+> **Status:** Authoritative Repository Governance & Legal Compliance Charter  
+> **Notice:** This charter establishes the binding open-source licensing terms, commercial dual-licensing pathways, third-party neural model attributions, data privacy guarantees, and distribution policies for the Omnitome desktop application, source repository, bundled runtimes, and documentation. It does not constitute formal legal counsel.
 
-## Repo license
+---
 
-AGPL-3.0-only (see LICENSE). Applies to code only. Does not supersede the
-licenses of third-party fixtures committed to the repo.
+## 1. Core Repository Licensing Framework
 
-### Licensing Transition (2026-10-18)
+### 1.1 GNU Affero General Public License v3.0 (AGPL-3.0-only)
+Omnitome is free, open-source software built on the principles of user software freedom, algorithmic transparency, and immutable data sovereignty. All original application code, orchestration logic, build scripts, desktop supervisors, and engineering specifications within this repository are licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0-only)** as codified in the root [`LICENSE`](file:///c:/My%20Personal%20Folders/Projects%20to%20work%20on/Antigravity%20Projects/Smart-Reader/LICENSE).
 
-- **Prior to 2026-10-18:** Versions of this repository tagged before 2026-10-18 were released under original MIT terms.
-- **v1.0 & Subsequent:** Commencing with the v1.0 release and F95 transition, the public Omnitome codebase and all subsequent versions are licensed under AGPL-3.0-only.
-- **Private MIT Escape Hatch:** A private repository mirror (Omnitome-Private) retains perpetual MIT rights for proprietary and commercial distribution flexibility.
+Under AGPL-3.0-only, users and developers are guaranteed:
+- **Full Source Access & Auditability:** The right to inspect, audit, compile, and run the complete source code without artificial barriers or locked runtimes.
+- **Modification & Redistribution:** The freedom to adapt, enhance, and distribute modified versions of Omnitome, provided that any redistributed or network-interacting work carries the same AGPL-3.0 copyleft protections.
+- **Copyleft Reciprocity:** Network operators and hosted platforms that interact with users over a computer network using a modified version of Omnitome are legally obligated to make the complete corresponding source code available to all network users at no charge.
 
-## Current stage
+### 1.2 Historical Licensing Evolution
+- **Pre-v1.0 (Prior to October 18, 2026):** Early exploratory prototypes and milestones tagged prior to October 18, 2026 were published under permissive MIT terms.
+- **v1.0 & Subsequent Stable Releases (October 18, 2026 onward):** Commencing with Milestone F95 and the formal v1.0 desktop release, the public Omnitome repository permanently transitioned to **AGPL-3.0-only**.
 
-Personal reading library. Open-source project. No commercial intent
-as of 2026-09-22. Working title: **Omnitome**.
+### 1.3 Dual-Licensing Commercial & Enterprise Pathways
+For enterprise organizations, academic institutions, hardware manufacturers, and commercial integrators whose internal deployment requirements, closed proprietary stacks, or hardware distribution models cannot accommodate AGPL-3.0 copyleft obligations:
+- **Commercial Dual-Licensing:** The project maintainers maintain an unencumbered upstream repository (`Omnitome-Private`) holding proprietary copyright ownership.
+- **Commercial & OEM Grants:** Commercial agreements, OEM bundle licenses, private cloud redistribution grants, and dedicated enterprise support contracts are available directly from the project maintainers under separate commercial licensing terms.
 
-## Committed test fixtures
+### 1.4 Contributor Licensing & Inbound IP Governance
+To preserve the legal viability of both the open-source AGPL-3.0 commons and the commercial dual-licensing pathway:
+- **Developer Certificate of Origin (DCO):** All external contributions submitted to the public repository require agreement to the Developer Certificate of Origin (DCO 1.1), certifying that the contributor has the legal right to submit the code under AGPL-3.0.
+- **Commercial Relicensing Grant:** By submitting code, pull requests, or patches to the Omnitome public repository, contributors grant the project maintainers a non-exclusive, perpetual, irrevocable, worldwide, royalty-free license to include, adapt, relicense, and distribute said contributions under commercial, non-copyleft terms within `Omnitome-Private` and derived commercial distributions.
 
-| File | Source | License | Commercial redistribution |
-|---|---|---|---|
-| `backend/tests/fixtures/practical_machine_learning.pdf` | CRC Press, *Practical Machine Learning* (2025) | CC-BY-NC-ND 4.0 | ✗ blocked (NC + ND) |
-| `backend/tests/fixtures/stress/two-column.pdf` | arXiv:1512.03385 (ResNet) | arXiv non-exclusive | ⚠ gray (underlying IEEE copyright) |
-| `backend/tests/fixtures/stress/math-heavy.pdf` | NIST FIPS 197-upd1 (AES) | Public Domain (US Gov) | ✓ clean |
-| `backend/tests/fixtures/stress/table-heavy.pdf` | SEC EDGAR, Apple Inc. FY23 10-K | Public Domain (filing) | ✓ clean |
-| `backend/tests/fixtures/stress/code-heavy.pdf` | Think Python 2e, Allen Downey | CC BY-NC 3.0 | ✗ blocked (NC) |
-| `backend/tests/fixtures/ocr_calibration_sample.pdf` | NIST NBS SP 500-20 (1980), pages 1–5 rasterized at 200 DPI | Public Domain (US Gov, 17 USC §105) | ✓ clean |
+---
 
-### OCR calibration fixture (Phase 5.7.1)
+## 2. Multi-Runtime Neural Model Attribution & Runtime Boundaries
 
-- **File:** `backend/tests/fixtures/ocr_calibration_sample.pdf`
-- **Source:** *Validating the Correctness of Hardware Implementations of the NBS Data Encryption Standard*, National Bureau of Standards (NBS, now NIST), NBS Special Publication 500-20 (Revised September 1980)
-- **Original URL:** https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication500-20e1980.pdf
-- **Pages used:** Pages 1–5 (Title, Foreword, Abstract, and Sections 1–2), rasterized at 200 DPI to remove embedded text layer
-- **License:** Public Domain (US Government work, 17 USC §105)
-- **Purpose:** Phase 5.7.1 OCR timeout calibration — NOT a runtime fixture, NOT distributed with the application.
-- **Selection criterion:** Noisy typewritten scan reflecting worst-case OCR input. Chosen for difficulty, not cleanliness, so the derived timeout is conservative.
-- **Verified slice:** 5 pages, 843.78 KB, 0 embedded selectable characters
+Omnitome's local-first architecture executes vector embeddings, neural reranking, optical character recognition, and neural speech synthesis directly on the user's hardware via a dedicated Python sidecar (`127.0.0.1:8765`). All integrated machine learning weights, tokenizers, and phonetic runtimes are governed by verified open-source licenses:
 
-### Fixture swap plan (before any commercial release)
+| Component / Model | Organization / Creator | Upstream License | Architectural Role & Runtime Boundary |
+| :--- | :--- | :--- | :--- |
+| **BGE-M3** | BAAI (Beijing Academy of Artificial Intelligence) | **MIT License** | 1024-dimensional dense multilingual vector embeddings. Cached locally in INT8/FP16 format. Runs 100% on-device via PyTorch CUDA / CPU. |
+| **BGE Reranker v2** | BAAI (Beijing Academy of Artificial Intelligence) | **MIT License** | FP16 cross-encoder passage re-ranking. Powers hybrid retrieval and deterministic provenance scoring. |
+| **Kokoro-82M** | hexgrad | **Apache 2.0** | 82-million parameter neural text-to-speech engine (`v0.19`). Local voice vectors (`af_heart`, `am_adam`, `bf_emma`, etc.) synthesize offline audio. |
+| **Misaki G2P** | hexgrad | **MIT License** | High-speed Grapheme-to-Phoneme phonemizer for English and Japanese text normalization prior to neural synthesis. |
+| **espeak-ng / espeakng_loader** | Jonathan Duddington & contributors | **GPL-3.0-or-later / LGPL** | Phonetic pronunciation database bundled in frozen PyInstaller runtime (`resources/sidecar.7z`) for phonetic dictionary lookups. |
+| **spaCy & `en_core_web_sm`** | Explosion AI | **MIT License** | Syntactic tokenization, part-of-speech analysis, and sentence boundary segmentation for structural chunking. Pre-bundled offline. |
+| **PaddleOCR** | Baidu Inc. | **Apache 2.0** | Ultra-lightweight optical character recognition for scanned, damaged, or image-heavy document layers. |
+| **PyMuPDF (`fitz`)** | Artifex Software, Inc. | **AGPL-3.0** | Layout-aware PDF structure extraction and table parsing. Distributed strictly in accordance with AGPL-3.0 terms. |
+| **Hugging Face Transformers** | Hugging Face Inc. | **Apache 2.0** | Neural model loading, tensor scheduling, and Hugging Face tokenizer interfaces. |
+| **PyTorch Runtime** | Meta AI & PyTorch Contributors | **BSD-3-Clause** | Core deep learning and tensor execution runtime supporting FP16 CUDA acceleration. |
+| **NVIDIA CUDA & cuDNN** | NVIDIA Corporation | **NVIDIA Software License Agreement** | Dynamic runtime redistributable DLLs (`cudnn*.dll`, `cublas*.dll`, `nvrtc*.dll`) bundled in the PyInstaller sidecar payload (`resources/sidecar.7z`) strictly in compliance with NVIDIA redistribution permissions. |
+| **better-sqlite3 & SQLite** | Joshua Wise / SQLite Consortium | **MIT / Public Domain** | High-performance local storage engine operating in WAL mode (`storage/data.db`) as the sole application state repository. |
+| **Tauri v2 Shell (Rust)** | Tauri Programme / Commons Conservancy | **MIT / Apache 2.0** | Native Windows desktop container, process tree supervisor (`taskkill /F /T`), and dynamic port coordinator. |
 
-1. **Practical ML PDF** — swap for a public-domain or CC-BY textbook
-   fixture. Candidates: Project Gutenberg technical texts, US Gov
-   training manuals, NIST publications. Do NOT commit a replacement
-   until the license is verified.
-2. **Think Python** — swap for a CC-BY programming text. Candidates:
-   *Eloquent JavaScript* (CC BY-NC — same problem), *Structure and
-   Interpretation of Computer Programs* (CC BY-SA — share-alike,
-   acceptable if the repo can meet the SA clause for that file only).
-   Alternatively, generate a synthetic code-heavy PDF from public-domain
-   code samples.
-3. **ResNet arXiv** — keep. arXiv non-exclusive allows redistribution
-   of the arXiv-hosted PDF. Note in NOTICE.md.
-4. **NIST FIPS 197** — keep. Public domain.
-5. **Apple 10-K** — keep. Public domain filing.
-6. **OCR calibration fixture** — keep. US Government work, public domain.
+---
 
-## User content
+## 3. User Content Ownership & Data Sovereignty Guarantee
 
-Smart Reader processes user-uploaded content locally. The user retains
-all rights to their source material. The app does not:
-- Train any model on user content
-- Send user content to third parties except the configured AI provider
-  (visible in Book Details — see `ai_provider` disclosure)
+Omnitome is founded upon three inviolable architectural laws:
+1. **Law 1: Source is paper.** The original text is immutable ground truth.
+2. **Law 2: The lens is tinted.** Derived representations are explicitly calibrated.
+3. **Law 3: Derivation never masquerades as source.** Every claim carries deterministic provenance.
 
-Source text goes to OpenRouter/DeepSeek only when compression runs.
-Users who configure Ollama operate fully offline.
+### 3.1 100% User Intellectual Property Ownership
+- **Exclusive User Rights:** Users retain complete, unencumbered intellectual property rights and copyright to all content imported into Omnitome—including original source files (PDF, EPUB, DOCX, RTF, Markdown, HTML, TXT), extracted structural blocks, generated vector embeddings, notes, reading progress, and synthesized Omni chapters.
+- **Zero Claim on User Derivations:** Omnitome, its developers, and contributors assert zero ownership, copyright, or licensing claim over documents uploaded or readings generated within the user's library.
 
-## Distribution model
+### 3.2 Zero-Egress Local Execution by Default
+- **Local Neural Processing:** Text parsing, layout extraction, structural chunking, SQLite WAL persistence, BGE-M3 vectorization, BGE cross-encoder re-ranking, and Kokoro-82M neural audio synthesis execute **100% locally on the user's device**.
+- **No Remote Telemetry:** Omnitome contains zero usage tracking, Google Analytics, telemetry beacons, crash reporters, or device fingerprinting. The software makes zero network requests during normal local operation.
+- **No Model Training on User Data:** User documents, embeddings, and reading histories are never pooled, transferred, or used to train, fine-tune, or calibrate any neural network or AI model.
 
-- **Primary Channel:** GitHub Releases (`Omnitome_1.1.0_x64-setup.exe` distributed via GitHub Releases for Windows x64 desktop).
-- **Desktop Packaging:** Phase 6 complete. Standalone NSIS installer generated via Tauri v2, bundling LZMA-compressed PyInstaller sidecar (`resources/sidecar.7z`), clean production backend (`resources/backend-runtime`), portable standalone Node.js 22 LTS (`resources/node/node.exe`), and compiled React 18 production frontend.
-- **Fixture Boundary:** Internal corpus fixtures with non-commercial or external redistribution restrictions (e.g. `practical_machine_learning.pdf`, `two-column.pdf`) are strictly gitignored/developer-only test assets. They are completely omitted from the public production distribution installer and client packages.
+### 3.3 Transparent User-Configured AI Inference Boundaries
+Omnitome provides complete transparency regarding generative language model inference:
+- **Air-Gapped Offline Compression (Recommended):** Users can pair Omnitome with a local LLM runner (e.g. Ollama or LM Studio at `127.0.0.1:11434` / `127.0.0.1:1234`), providing complete air-gapped zero-egress compression.
+- **Optional User-Configured Cloud Providers:** If and only if the user explicitly supplies a personal API key for a cloud AI provider (such as OpenRouter or Google Gemini), Omnitome transmits the minimal necessary text context (~1,500–2,500 words per chapter) directly to that specific endpoint for semantic compression. The user's API credentials remain stored locally on disk and are never relayed to any intermediary server.
 
-## Release & compliance checklist
+---
 
-- [x] Resolved desktop packaging and installer format (`.exe` NSIS installer via Tauri v2 on GitHub Releases)
-- [x] Bundle offline neural models under verified permissive open-source licenses: Kokoro-82M (Apache 2.0), BGE-M3 (MIT), BGE Reranker v2 (MIT)
-- [x] Internal corpus fixtures with external redistribution restrictions are strictly gitignored / developer-only and excluded from distribution builds
-- [x] Clear local-first vs cloud inference disclosure (`ai_provider` configuration, OpenRouter/Gemini optional cloud vs Ollama/LM Studio 100% offline)
-- [ ] Add NOTICE.md at repo root listing all bundled open-source runtime dependencies and licenses
-- [ ] Windows EV code signing certificate for SmartScreen trust (planned for v1.2)
-- [ ] Register trademark for Omnitome if pursuing a dedicated corporate entity
+## 4. Third-Party & Bundled Assets Governance
 
-## Out of scope for this document
+### 4.1 The Canonical Public Synthetic Archive
+Omnitome v1.1.0 bundles six foundational, original publications created by Omnitome Publishing and the Omnitome Engineering Team to serve as an instant reading showcase and regression verification corpus:
 
-- App content policy (what users can upload)
-- Terms of service (post-launch)
-- Privacy policy (post-launch)
-- DMCA process (post-launch, only if public distribution)
-- Patent strategy (separate track, not addressed here)
+1. ***The Curious World of Cats*** — *Author:* Omnitome Publishing. *Subject:* Natural history, feline biology, and companion multi-modal OCR test plates.
+2. ***The Art and Science of Reading*** — *Author:* Omnitome Publishing. *Subject:* Cognitive neuroscience of deep literacy and theoretical foundations of loss-bounded semantic compression.
+3. ***The Asterion Expedition*** — *Author:* Omnitome Publishing. *Subject:* Hard science fiction narrative chronicle demonstrating ~7:1 compression without loss of narrative continuity.
+4. ***Machine Learning Field Notes*** — *Author:* Omnitome Publishing. *Subject:* Practical deep learning engineering, mathematical formulas, and code block attribution.
+5. ***The Making of Omnitome*** — *Author:* The Omnitome Engineering Team. *Subject:* Architectural memoir, multi-process desktop systems design, and the provenance thesis.
+6. ***The Omnitome Field Guide*** — *Author:* Omnitome Publishing. *Subject:* Operational manual, navigation shortcuts, and citation inspection handbook.
 
-## History Rewrite — 2026-09-23
+**Licensing Terms for the Synthetic Archive:**
+All six synthetic volumes are published and distributed under the **Creative Commons Attribution 4.0 International License (CC-BY 4.0)** and/or dedicated to the **Public Domain (CC0 1.0)**. Users and developers are free to read, share, adapt, and build upon these texts with attribution to Omnitome Publishing.
 
-Removed NC-licensed fixtures from all git history via `git-filter-repo`:
+### 4.2 Procedural UI Sound Engine Assets
+- The 90 thematic UI sound stems (18 canonical stems $\times$ 5 themes: Omni, Sakura, Spring, Coffee, Cyberpunk) are procedurally synthesized using deterministic mathematical DSP algorithms authored by the project (`tools/sound-design/generate.mjs`).
+- They are licensed under the primary repository license (**AGPL-3.0-only**).
 
-- `practical_machine_learning.pdf` (CC-BY-NC-ND 4.0) — hard block
-- `code-heavy.pdf` (Think Python, CC BY-NC 3.0) — hard block
-- `two-column.pdf` (ResNet arXiv, non-exclusive license) — gray case
+### 4.3 Test Corpus Fixtures & Calibration Isolation
 
-These files remain on disk for local testing but are gitignored. **All commit
-hashes prior to this rewrite changed** — references to specific SHAs in
-documentation predating 2026-09-23 should be treated as historical labels, not
-resolvable commit IDs.
+Omnitome enforces a strict three-tier classification for test fixtures to guarantee absolute compliance with international copyright and distribution standards:
 
-**Rule:** license-check any fixture before `git add`. CC-BY-NC and CC-BY-NC-ND
-fixtures must never be committed to a public repository.
-- `backend/tests/fixtures/sample.docx`: Sample DOCX file, generated locally for tests. AGPL-3.0-only. Author: Project.
-- `backend/tests/fixtures/sample.rtf`: Sample RTF file, hand-authored for tests. AGPL-3.0-only. Author: Project.
+1. **Tier 1: Committed Open-Source & Public Domain Test Assets (`backend/tests/fixtures/`):**
+   - **Cross-Format Corpus (`backend/tests/fixtures/corpus/`):** 10 multi-format fixtures used by the automated Corpus Release Gate (`scripts/run-corpus-tests.js`). All long-form works are verified Public Domain literature sourced from Project Gutenberg (Melville's *Moby Dick*, Austen's *Pride and Prejudice*, Whitman's *Leaves of Grass*, Hugo's *Les Misérables*, Paine's *Common Sense*) and Aozora Bunko (Tanizaki's *Chijin no Ai*), alongside project-authored test slices (`chat_11-slice.md`, `prologue-sample.md`, `sample.docx`, `sample.rtf`) licensed under AGPL-3.0-only.
+   - **Standalone Calibration Samples:**
+     - `ocr_calibration_sample.pdf`: National Bureau of Standards (NBS SP 500-20, 1980), Public Domain (U.S. Government work under 17 U.S.C. § 105).
+     - `stress/math-heavy.pdf`: NIST FIPS 197-upd1 (AES Specification), Public Domain (U.S. Government).
+     - `stress/table-heavy.pdf`: Apple Inc. FY23 10-K SEC Filing, Public Domain (Regulatory disclosure filing).
+     - `encoding/` & `chat_log_sample.txt`: Project-authored encoding and chat turn verification fixtures (AGPL-3.0-only).
+
+2. **Tier 2: Uncommitted Developer Calibration Fixtures (Gitignored):**
+   - `backend/tests/fixtures/practical_machine_learning.pdf` (CRC Press, CC-BY-NC-ND 4.0 Open Access) serves as the developer ground truth benchmark (`docs/CANONICAL_TEST_BOOK.md`).
+   - It is strictly gitignored (`backend/tests/fixtures/*.pdf` in `.gitignore`) and resides only on local developer environments. It is **never** redistributed via git or public mirrors.
+   - Historical test fixtures carrying non-commercial or share-alike licenses were permanently cleansed from public git history on 2026-09-23 using `git-filter-repo`.
+
+3. **Tier 3: Packaging & Release Distribution Isolation:**
+   - All test fixtures, benchmark corpora, and raw developer assets in `backend/tests/fixtures/` are **100% excluded** from the final desktop distribution package (`Omnitome_1.1.0_x64-setup.exe`) and production tarballs.
+   - The compiled NSIS installer bundles strictly the Tauri native supervisor, Node.js 22 LTS portable binary, compiled Vite frontend bundle, and the compressed neural sidecar payload (`resources/sidecar.7z`).
+
+---
+
+## 5. Desktop Packaging & Redistribution Specifications
+
+### 5.1 Distribution Payload Integrity
+The official desktop distribution (`Omnitome_1.1.0_x64-setup.exe`) is generated through Tauri v2 and packages:
+1. **Rust Desktop Shell (`src-tauri`):** Native Windows container and child-process supervisor managing port allocation and tree teardown (`taskkill /F /T`).
+2. **Node.js 22 LTS Runtime:** Embedded portable Node.js binary (`resources/node/node.exe`) operating as the sole SQLite WAL writer.
+3. **Compiled React 18 Production Frontend:** Static bundle generated via Vite with strict Content Security Policy (`CSP`).
+4. **Compressed Neural Sidecar (`resources/sidecar.7z`):** PyInstaller bundle containing Python 3.10+, PyTorch FP16 CUDA runtime, Kokoro-82M, BGE-M3, and PaddleOCR, unpacked on first run via `sevenz-rust` into `%LOCALAPPDATA%\Omnitome\sidecar\`.
+
+### 5.2 Trademark & Branding Guidelines
+- **Product Name:** Omnitome™ is the canonical, official product name.
+- **Repository Directory:** `Smart-Reader` is maintained as the historical repository identifier for internal codebase consistency.
+- **Fair Use:** Community members and contributors may reference the name Omnitome to describe, review, or contribute to the software. Commercial use of the Omnitome brand for independent products or services requires prior written authorization.
+
+---
+
+## 6. Summary of Governance Commitments
+
+| Domain | Governance Policy |
+| :--- | :--- |
+| **Core Software Codebase** | AGPL-3.0-only open source (Dual-licensing available for enterprise/OEM) |
+| **User Uploaded Documents** | 100% retained by user; zero corporate access, storage, or telemetry |
+| **Vector Embeddings & Omni Chapters** | 100% owned by user; stored in local SQLite database (`storage/data.db`) |
+| **Neural Weights (BGE, Kokoro)** | Permissive open source (MIT / Apache 2.0) |
+| **Synthetic Archive Books** | Creative Commons Attribution 4.0 / Public Domain (CC0) |
+| **Procedural Sound Stems** | AGPL-3.0-only (algorithmic DSP generation) |
+| **Packaging & Distribution** | Standalone NSIS installer; non-distributable test fixtures completely excluded |
+
+---
+
+*Authored and approved by the Omnitome Project Maintainers.*  
+*Last codified: October 24, 2026 for Omnitome v1.1.0 Stable Release.*

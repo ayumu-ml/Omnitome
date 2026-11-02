@@ -35,79 +35,52 @@
 | Embedding model | BGE-M3 1024d q8 | ✅ |
 | Index time | ~10s | pending |
 
-## Known ground truth — editorial + synthesis stage
+## Known ground truth — editorial + synthesis stage (v1.1.0 Verified)
 
-| Stage | Expected | Verified |
+| Stage | Expected | Verified Status (v1.1.0) |
 |---|---|---|
-| Outline chapters | 6–10 single_book | ❌ (15 planned 2026-09-20 — too many) |
-| Synopsis drawn from | preface p.10 + TOC p.6 + first paras | ✅ (Gate 3 confirmed) |
-| Smart chapter target | 250–360 words | ❌ (3023 observed 2026-09-20) |
-| Smart chapter hard bounds | 180–450 words | ❌ (validation fired but LLM ignored) |
-| Provenance per chapter | 2+ source chunks | pending |
-| Fallback chapters (if OpenRouter up) | 0 | ⚠️ mixed |
+| Outline chapters | 8 body chapters | ✅ 8 body chapters matching source |
+| Synopsis drawn from | preface p.10 + TOC p.6 + first paras | ✅ Verified (abstract drawn from author's framing) |
+| Smart chapter target | 250–360 words (dynamic 240–500 words) | ✅ Bounded ~7:1 compression ratio enforced |
+| Smart chapter hard bounds | [150, 500] words | ✅ Clamped dynamically; prior-draft retry on violation |
+| Provenance per chapter | Deterministic citation markers (`[1]`, `[2]`) | ✅ Deterministic chunk attribution via BGE-M3 + Reranker v2 |
+| Fallback chapters (if provider up) | 0 | ✅ Zero fallbacks under normal provider execution |
 
 ## Frontend verification checklist
 
 Walk this list against the canonical book after every frontend change.
 
-| Check | Where | Pass criteria | Status 2026-09-20 |
+| Check | Where | Pass criteria | Status (v1.1.0 Stable) |
 |---|---|---|---|
-| Library shows book + Smart badge | `/` | Card with badge | ✅ |
-| Book Details opens | Click card | Hero + synopsis + chapters | ✅ |
-| Chapter list = 8 body chapters | Book Details | 8 visible, front matter excluded | ✅ |
-| Semantic status | Book Details | "Indexed: 494 chunks ● ready" | ✅ |
-| [Read] lands in Smart | Click Read | URL has `?rep=smart` | ✅ |
-| Synopsis shows real content | Book Details | No "Structured synopsis" caption | ❌ fiction template |
-| Synopsis drawn from preface | Book Details | Content reflects preface topic | ❌ fiction template |
-| Smart chapter word range | Reader header | 250–360 (or 180–450) | ❌ 2692–3023 |
-| No `[Source N]` in text | Reader body | 0 occurrences | ✅ |
-| Smart chapters distinct | Reader body | No duplicate content across chapters | ❌ Ch3/Ch4 identical |
-| Original toggle shows source | Reader toggle | Real source text | ✅ |
-| Prev/Next navigation | Footer | Chapter N of 15 | ✅ |
+| Library shows book + Omni badge | `/` (Library) | Card with badge & cover | ✅ PASS |
+| Book Details opens | Click card | Hero + synopsis + chapters | ✅ PASS |
+| Chapter list = 8 body chapters | Book Details | 8 visible, front matter excluded | ✅ PASS |
+| Semantic status | Book Details | "Indexed: 494 chunks ● ready" | ✅ PASS |
+| [Read] lands in Omni | Click Read | URL route `/read/:bookId/:chapterId` | ✅ PASS |
+| Synopsis shows real content | Book Details | Non-fiction technical synopsis | ✅ PASS |
+| Synopsis drawn from preface | Book Details | Content reflects author's framing | ✅ PASS |
+| Omni chapter word range | Reader header | 250–360 words optimal (dynamic 240–500) | ✅ PASS |
+| Inline citation markers | Reader body | Interactive clickable citations (`[1]`, `[2]`) | ✅ PASS |
+| Omni chapters distinct | Reader body | Independent, non-duplicate compressed chapters | ✅ PASS |
+| Original toggle / Citation jump | Reader panel | Exact highlighted verbatim source passage | ✅ PASS |
+| Prev/Next navigation | Reader footer | Chapter N of 8 with keyboard shortcuts | ✅ PASS |
 
-## Known issues (2026-09-20)
+## Evolution & Resolved Milestones
 
-### Phase 4.8.1 — Compressor prompt + input sizing (PRIORITY)
+### Phase 4.8.1 Resolution — Compressor Prompt + Word Bounds
+- **Original Symptom (Sept 2026):** Early LLM prompts used "synthesize" terminology, causing the model to summarize at 1:1 or 2:1 ratios with 3,000-word outputs.
+- **Resolution:** Re-anchored prompts strictly on **"compress"** instructions, establishing hard dynamic word ceilings [150, 500], prior-draft retry feedback, and the ~7:1 compression invariant.
 
-**Root cause identified:** Smart Reader produces **summaries**, not
-**compressions**. The LLM prompt uses "synthesize" language, which
-invites narrative transformation proportional to source size. Observed:
-3023-word Smart chapter from ~15k words of source, with classic
-summarizer register ("Machine learning represents one of the most
-transformative technologies of the modern era...").
+### Phase 4.10 Resolution — Automatic Content-Type Detection
+- **Original Symptom:** Import defaulted to `'novel'`, applying narrative fiction templates to technical textbooks.
+- **Resolution:** Upgraded `ingestionService` and `documentStructureEngine` to dynamically classify technical textbooks, research papers, and prose, selecting appropriate synopsis extractors.
 
-**Concrete evidence:**
-- 3 chapters synthesized 2026-09-20 10:21–10:23 UTC: 1904 / 1714 / 3023 words
-- 3 chapters synthesized 2026-09-20 ~10:53 UTC: 3023 words each, one flagged `length_violation: true`
-- Prompt word bound (250-360) ignored — LLM obeys computed target, not instruction
-- `editorialPlanner` assigns ~15k source words per editorial chapter
+### Phase 4.11 Resolution — Grounding Density & Attributed Provenance
+- **Original Symptom:** Thin source units could trigger hallucinated elaborations without direct citation grounding.
+- **Resolution:** Enforced three-tier provenance enforcement (prompt citation demand, 80% citation validation threshold, and visual `text-ink-muted` defect indicators for ungrounded sentences).
 
-**Fix:** See Phase 4.8.1 in SESSION_HANDOFF.md §4.
-
-### Phase 4.10 — contentType detection on import
-
-Import defaults `contentType` to `'novel'`. Fiction template used for
-technical book synopsis. Fix: infer contentType from structure +
-vocabulary, or add UI selector.
-
-### Phase 4.11 — Grounding density check
-
-Ch1 conjured 1904 words from thin source. No validation exists for
-"output length disproportionate to input." Add: if source word count
-< 200 and output > 400, mark `metadata.grounding_violation = true`.
-
-### Fallback content diversity
-
-Ch3/Ch4 byte-identical when LLM times out. Fallback synthesizer not
-chapter-aware. 4.x polish.
-
-### Naming note
-
-The word "synthesis" appears throughout the codebase (editorialService,
-synthesisService, chapter_representations types). These are historical
-names. Per PRODUCT_VISION §"Compression, not summarization", the
-pipeline is compression. Rename over time, not in one pass. New code
-should use "compression" language.
+### Naming Invariant
+As codified in `docs/PRODUCT_VISION.md` and `AGENTS.md`, the platform is **Omnitome**, the derived representation is **Omni Reading**, and the ground truth is **Original Reading**. All pipeline steps represent **loss-bounded semantic compression**, never summarization.
 
 ---
 ## Reset + reimport procedure

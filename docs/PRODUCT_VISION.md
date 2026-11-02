@@ -1,32 +1,36 @@
-# Smart Reader — Product Vision
+# Omnitome — Product Vision & Architectural Contract
 
-> **North star document.** Every technical decision defers to this. The
-> backend exists to serve this model; the frontend exists to surface it.
-> When implementation and this document disagree, this document wins —
-> or this document gets revised deliberately, in its own commit.
-
----
-
-## Working title
-
-**Omnitome** — omni + tome, literally "all books."
-
-The repo name (`Smart-Reader`) is historical and the directory name.
-The product name is not decided. Omnitome is a working label while
-the app ships as a personal tool. Renaming the repo is a future
-decision, not required for the app to function.
+> **North Star Document.** Product: **Omnitome** *(Repository Directory: `Smart-Reader`)*.  
+> **Release Version:** `v1.1.0 Stable`  
+> Every technical decision defers to this contract. The backend exists to serve this model; the frontend exists to surface it. When implementation and this document disagree, this document wins — or this document gets revised deliberately in its own commit.
 
 ---
 
-## The core insight
+## Product Identity & Core Invariant
 
-Smart Reader is not a summary app. It is a **navigable lens over source
-material you own**. Every compressed view is traceable back to the exact
-position and passage it was derived from.
+Omnitome — from *omni* ("all") + *tome* ("volumes/books").
 
-The Original is not a "mode." It is the ground truth you reach by
-clicking through from Smart. The two representations are not peers —
-one serves the other.
+The repository directory (`Smart-Reader`) is historical and internal. **Omnitome** is the definitive, canonical product identity.
+
+### The Three Foundational Laws
+1. **Law 1: Source is paper.** Neutral, book-like, uncorrupted ground truth. Original uploaded documents (PDF, EPUB, DOCX, RTF, Markdown, Web, TXT) are preserved verbatim. The system never alters, rewrites, or mutates original source text.
+2. **Law 2: The lens is tinted.** Derived representations are explicitly identified and calibrated. Derived chapters densify information while preserving the source's concepts.
+3. **Law 3: Derivation never masquerades as source.** Every synthesized sentence must carry deterministic, clickable citations linking directly back to verbatim source paragraphs/chunks. Sentences without provenance are treated as defects, rendered with distinct visual indicators (`text-ink-muted` with dotted underline).
+
+---
+
+## The Core Insight & Two-Representation Invariant
+
+Omnitome is not a summary app. It is a **navigable lens over source material you own**. Every compressed view is traceable back to the exact position and passage it was derived from.
+
+| Representation | View & Role | Architectural Invariant |
+| :--- | :--- | :--- |
+| **Original Reading** | **Research View** | **Immutable Ground Truth.** Pristine verbatim source document. Governed by Law 1 (*"Source is paper"*). |
+| **Omni Reading** | **Library View** | **Derived Reading Lens.** Loss-bounded semantic compression (~7:1 ratio, dynamic 240–500 words, target 250–360 words per chapter). Governed by Law 2 & Law 3. |
+
+The Original is not a "mode." It is the ground truth you reach by clicking through from Omni. The two representations are not peers — one serves the other: **Omni is the product. Original is the proof.**
+
+The Moat: *"Nobody wants compression. They want traceability."* Competitors sell summaries; Omnitome sells navigable, verifiable provenance.
 
 ---
 
@@ -83,7 +87,7 @@ which source chapter that chunk belongs to, and which position.
 
 ## Compression, not summarization
 
-Smart Reader is a **compression** engine, not a **summarization**
+Omnitome is a **compression** engine, not a **summarization**
 engine. The difference is the whole product.
 
 A summarizer:
@@ -168,7 +172,7 @@ takes 40 seconds, the UI says 40 seconds, not a fake progression.
 ### Inline source tracker
 
 Every Smart sentence carries a subtle citation marker. Interaction
-opens the source material **inside the Smart Reader interface** at the
+opens the source material **inside the Omnitome interface** at the
 exact position, with the passage highlighted.
 
 **Cross-platform interaction pattern:**
@@ -179,7 +183,7 @@ exact position, with the passage highlighted.
   with "Trace to source."
 
 The source view is **not a separate route**. It is an overlay or side
-panel within the reader. The user never leaves the Smart Reader — the
+panel within the reader. The user never leaves Omnitome — the
 original material is available within it.
 
 **Round-trip required:** after tracing to source, browser Back (or
@@ -311,29 +315,29 @@ Chapter set arrives over the next minute.
 
 ---
 
-## Smart is the product. Original is the proof.
+## Omni is the product. Original is the proof.
 
-Smart Reading is not a feature of the app — it is the app. The
-reading experience is Smart-Reading-first. Original reading is the
-ground truth you reach by clicking a specific line in Smart.
+Omni Reading is not a feature of the app — it is the app. The
+reading experience is Omni-Reading-first. Original reading is the
+ground truth you reach by clicking a specific line in Omni.
 
 This reframes several earlier decisions:
 
-1. **The Original | Smart toggle is not a peer switch.** Under this
-   framing they are not peers. The reader should default to Smart
-   and offer a subtle "Source" or "Original" affordance — not a
+1. **The Original | Omni toggle is not a peer switch.** Under this
+   framing they are not peers. The reader defaults to Omni
+   and offers a subtle "Source" or "Original" affordance — not a
    symmetric two-option control in the top bar.
 
-2. **Default is always Smart** when the book has representations.
+2. **Default is always Omni** when the book has representations.
    No automatic per-chapter fallback to Original.
 
-3. **Click-through is the primary path.** Clicking a [Source N] line
-   in Smart opens the source panel at that passage — the round-trip
-   pattern promised by the Phase 5 inline tracker.
+3. **Click-through is the primary path.** Clicking an inline citation marker
+   (`[1]`, `[2]`) in Omni opens the source panel at that passage — the round-trip
+   provenance pattern implemented and verified in the reader interface.
 
-The Phase 3.5 / 4.5 reader UI (peer toggle, per-chapter mode
-resolution) is superseded by this framing. Implementation is a
-Phase 5.x item — do not retro-fit in this session.
+The early Phase 3.5 / 4.5 reader prototype (peer toggle, per-chapter mode
+resolution) was permanently superseded by this framing, which was canonically
+implemented in the v1.0 and v1.1.0 releases.
 
 ---
 

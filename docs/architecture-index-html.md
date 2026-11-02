@@ -1,4 +1,9 @@
-# Smart Reader Architecture Report
+# Historical Architecture Report: `index.html` (Legacy Pre-React Prototype)
+
+> [!NOTE] **Historical Archival Reference**  
+> This document records the pre-v1.0 vanilla HTML prototype architecture audit conducted prior to the React 18, Vite, and Zustand migration (Phases 1–3.5). It is preserved for historical provenance and architectural continuity. For the active production architecture, refer to `docs/ARCHITECTURE.md` and `docs/FRONTEND_BLUEPRINT_SPEC.md`.
+
+---
 
 ## 1. Top-level views / panels / modals
 

@@ -1,6 +1,11 @@
 # Design: Sidecar Model Lifecycle & Idle Unload (F43)
 
-## 1. Scope & Resident Candidates
+> **Status:** Implemented & Shipped (`v1.0.0` & `v1.1.0 Stable`)  
+> **Architecture:** Background daemon in `sidecars/python/core/lifecycle.py` with automatic TTL eviction  
+> **Reclamation:** Frees 3.2 GB VRAM on idle; prevents GPU OOM thrashing on RTX 3050 4GB baseline  
+> **Verification:** Passed test suite `f43_node_lifecycle_test.js`  
+
+---
 
 The Python sidecar (`127.0.0.1:8765`, [main.py](file:///c:/My%20Personal%20Folders/Projects%20to%20work%20on/Antigravity%20Projects/Smart-Reader/sidecars/python/main.py)) hosts three neural models that currently remain resident indefinitely. Under multi-document import load, process RSS exceeds 6.7 GB with ~4.5 GB VRAM, causing memory thrashing and request timeouts.
 

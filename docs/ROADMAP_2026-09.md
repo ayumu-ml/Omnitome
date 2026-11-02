@@ -1,5 +1,8 @@
 # Part 15: RAG Upgrade + Multimodal Vision — Consolidated Context
 
+> [!NOTE] **Completed Historical Milestone & Strategy Record (September 2026)**  
+> This document records the architectural decisions from the September 2026 sprint (BGE-M3 1024d transition, React desktop UI, Kokoro TTS, and NSIS desktop packaging). All foundational milestones were completed and shipped in the v1.0 and v1.1.0 releases. For active roadmap priorities (e.g. F55 Domain-Aware Structure Engine), refer to `docs/SESSION_HANDOFF.md` and `docs/PRODUCTIZATION_STRATEGY.md`.
+
 ---
 
 ## 1. Where We Are (Updated)

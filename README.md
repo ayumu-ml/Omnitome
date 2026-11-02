@@ -28,13 +28,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/avengersvstheflash/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe">
+  <a href="https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe">
     <img src="https://img.shields.io/badge/⚡_Download_Omnitome_v1.1.0-Windows_x64_(1.95_GB)-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Omnitome v1.1.0 for Windows" />
   </a>
-  <a href="https://github.com/avengersvstheflash/Omnitome/releases/tag/v1.1.0">
+  <a href="https://github.com/ayumu-ml/Omnitome/releases/tag/v1.1.0">
     <img src="https://img.shields.io/badge/Release_Notes-v1.1.0_Welcome_Wizard-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Release Notes" />
   </a>
-  <a href="https://github.com/avengersvstheflash/Omnitome/blob/main/assets/omnitome_demo_60s.mp4">
+  <a href="https://github.com/ayumu-ml/Omnitome/blob/main/assets/omnitome_demo_60s.mp4">
     <img src="https://img.shields.io/badge/🎬_Watch_Demo-60s_Overview-E0245E?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo" />
   </a>
 </p>
@@ -60,7 +60,7 @@
 
 Omnitome combines **loss-bounded semantic compression (~7:1)** with **100% deterministic attribution**. Experience the core reading workflows below:
 
-> 📺 **Prefer audio narration?** You can still watch or download the complete [60-Second Master Demo Video with Kokoro-82M Voiceover (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4) or inspect the [video file directly on GitHub](https://github.com/avengersvstheflash/Omnitome/blob/main/assets/omnitome_demo_60s.mp4).
+> 📺 **Prefer audio narration?** You can still watch or download the complete [60-Second Master Demo Video with Kokoro-82M Voiceover (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4) or inspect the [video file directly on GitHub](https://github.com/ayumu-ml/Omnitome/blob/main/assets/omnitome_demo_60s.mp4).
 
 ---
 
@@ -157,7 +157,7 @@ You don't need a PhD in machine learning or hours of terminal setup to start usi
 ```
 
 1. **Download the Windows Installer:**
-   - Grab [Omnitome_1.1.0_x64-setup.exe](https://github.com/avengersvstheflash/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe) from GitHub Releases.
+   - Grab [Omnitome_1.1.0_x64-setup.exe](https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe) from GitHub Releases.
    - Run the installer. All neural models (BGE-M3, BGE Reranker v2, Kokoro TTS) are bundled offline.
 2. **Launch & Choose Your LLM:**
    - On first launch, the **Welcome Wizard** guides you:
@@ -640,8 +640,8 @@ Omnitome ships as a self-contained Windows desktop installer with zero manual Py
 
 | Resource | Direct Link | File Info |
 | :--- | :--- | :--- |
-| **Direct Binary Download** | **[Download Omnitome v1.1.0 for Windows (64-bit Installer)](https://github.com/avengersvstheflash/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe)** | `Omnitome_1.1.0_x64-setup.exe` (~1.95 GB) |
-| **Release & Changelog** | **[GitHub Release v1.1.0 — Welcome Wizard & Synthetic Archive](https://github.com/avengersvstheflash/Omnitome/releases/tag/v1.1.0)** | Release notes, asset tags & checksums |
+| **Direct Binary Download** | **[Download Omnitome v1.1.0 for Windows (64-bit Installer)](https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe)** | `Omnitome_1.1.0_x64-setup.exe` (~1.95 GB) |
+| **Release & Changelog** | **[GitHub Release v1.1.0 — Welcome Wizard & Synthetic Archive](https://github.com/ayumu-ml/Omnitome/releases/tag/v1.1.0)** | Release notes, asset tags & checksums |
 
 - **Zero-Config Self-Contained Runtime:** Pre-bundles the Python 3.10 runtime, PyTorch FP16 CUDA/cuDNN binaries, Kokoro-82M neural TTS model, and Node.js 22 LTS orchestrator.
 - **Isolated Deployment:** Extracts cleanly into `%LOCALAPPDATA%\Omnitome` on first launch without polluting system PATHs.
@@ -669,7 +669,7 @@ Omnitome is structured as a coordinated multi-process desktop system (Tauri v2 R
 #### 1. Initial Repository Setup
 ```bash
 # Clone repository
-git clone https://github.com/avengersvstheflash/Omnitome.git
+git clone https://github.com/ayumu-ml/Omnitome.git
 cd Omnitome
 
 # Install Node orchestrator and root dependencies
@@ -787,7 +787,7 @@ If you utilize Omnitome's architecture, loss-bounded semantic compression contra
   year = {2026},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/avengersvstheflash/Omnitome}},
+  howpublished = {\url{https://github.com/ayumu-ml/Omnitome}},
   version = {1.1.0}
 }
 ```

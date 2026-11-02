@@ -1,4 +1,7 @@
-# BUILD 3B.1.6 PDF PIPELINE AUDIT (READ-ONLY DIAGNOSTIC)
+# BUILD 3B.1.6 PDF PIPELINE AUDIT (HISTORICAL DIAGNOSTIC)
+
+> [!NOTE] **Historical Diagnostic Record**  
+> This document records the diagnostic audit of the early 3B.1.6 PDF ingestion decoupling between `pdfParser.js` and `documentStructureEngine.js` from September 2026. The identified bugs (TOC regex and chapter heading coalescence) were resolved in Build 3B.1.9 and verified through the 10-fixture Corpus Release Gate.
 
 **Date:** September 14, 2026  
 **Auditor:** Senior Systems Auditor & Document Parsing Engineer  

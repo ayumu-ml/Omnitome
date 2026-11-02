@@ -1,4 +1,9 @@
-# Architecture Report: `src/style.css`
+# Historical Architecture Report: `src/style.css` (Legacy Pre-React Design System)
+
+> [!NOTE] **Historical Archival Reference**  
+> This document records the pre-v1.0 CSS design token and layout audit conducted prior to the Tailwind CSS v3.4, React 18, and multi-theme engine migration (Phases 1–3.5). It is preserved for historical provenance. For the active styling contract and theme catalog, refer to `docs/DESIGN_OMNI_THEME.md` and `frontend/src/styles/`.
+
+---
 
 ## 1. CSS variables / design tokens
 
