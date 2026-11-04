@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { useImportQueueStore } from '../../store/useImportQueueStore';
-import { StageChecklist } from './StageChecklist';
+import { PipelineStepper } from './PipelineStepper';
 import { ImportTask } from '../../types/domain';
 import { formatRelativeTime } from '../../lib/relativeTime';
 
@@ -252,9 +252,9 @@ export function PersistentImportWidget() {
               </div>
             </div>
 
-            {/* Stage checklist (existing F69) */}
-            <div className="pt-1 text-caption">
-              <StageChecklist stages={activeTask.stages} isCompleted={activeTask.status === 'completed'} />
+            {/* Unified Pipeline Stepper */}
+            <div className="pt-2">
+              <PipelineStepper task={activeTask} orientation="vertical" showProgressTrack={false} />
             </div>
 
             {/* Cancel Task */}

@@ -27,6 +27,143 @@ class ImportQueueService {
     this.isProcessingCount = 0;
     this.currentTaskIds = new Set();
     this.cancellationTokens = new Map(); // taskId -> { cancelled: boolean }
+    this.sseClients = new Set();
+    this.logNextId = 1;
+    this.taskLogs = new Map(); // taskId -> Array<LogEntry>
+    this.recentLogs = []; // ring buffer max 250
+
+    // Hook into repository events for instant SSE telemetry
+    importQueueRepository.on('task_created', (task) => {
+      this.addLog(task.id, `Queued for processing: "${task.sourceTitle || task.source_title}"`);
+      this.broadcastTelemetry(task.id);
+      this.broadcastQueueUpdate();
+    });
+
+    importQueueRepository.on('task_updated', (task) => {
+      if (task.stageLabel && (task.status === 'processing' || task.status === 'initializing')) {
+        const stageName = task.stageName || 'Pipeline';
+        this.addLog(task.id, `[Stage ${task.currentStage}/5] ${stageName} — ${task.stageLabel}`);
+      }
+      this.broadcastTelemetry(task.id);
+      this.broadcastQueueUpdate();
+    });
+
+    // Capture backend pipeline console output for real-time terminal stream
+    this._interceptPipelineLogs();
+  }
+
+  _interceptPipelineLogs() {
+    const origLog = console.log.bind(console);
+    const origWarn = console.warn.bind(console);
+    const origError = console.error.bind(console);
+
+    console.log = (...args) => {
+      origLog(...args);
+      try {
+        const msg = args.map((a) => (typeof a === 'string' ? a : typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+        if (msg.startsWith('[Import') || msg.startsWith('[Pipeline') || msg.startsWith('[Ingestion') || msg.startsWith('[SemanticChunker]') || msg.startsWith('[BookClassifier]')) {
+          this.addLog(null, msg, 'info');
+        }
+      } catch (_) {}
+    };
+
+    console.warn = (...args) => {
+      origWarn(...args);
+      try {
+        const msg = args.map((a) => (typeof a === 'string' ? a : typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+        if (msg.startsWith('[Import') || msg.startsWith('[Pipeline') || msg.startsWith('[Ingestion') || msg.startsWith('[SemanticChunker]') || msg.startsWith('[BookClassifier]')) {
+          this.addLog(null, msg, 'warn');
+        }
+      } catch (_) {}
+    };
+
+    console.error = (...args) => {
+      origError(...args);
+      try {
+        const msg = args.map((a) => (typeof a === 'string' ? a : typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+        if (msg.startsWith('[Import') || msg.startsWith('[Pipeline') || msg.startsWith('[Ingestion') || msg.startsWith('[SemanticChunker]') || msg.startsWith('[BookClassifier]')) {
+          this.addLog(null, msg, 'error');
+        }
+      } catch (_) {}
+    };
+  }
+
+  addSSEClient(res) {
+    this.sseClients.add(res);
+  }
+
+  removeSSEClient(res) {
+    this.sseClients.delete(res);
+  }
+
+  broadcastSSE(event, data) {
+    const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    for (const client of this.sseClients) {
+      try {
+        client.write(payload);
+      } catch (_) {
+        this.sseClients.delete(client);
+      }
+    }
+  }
+
+  broadcastTelemetry(taskId) {
+    const task = taskId ? (this.getTaskById(taskId) || importQueueRepository.getById(taskId)) : importQueueRepository.getActiveTask();
+    if (!task) return;
+    const telemetry = {
+      taskId: task.id,
+      currentStage: task.currentStage,
+      stageName: task.stageName,
+      progressPercentage: task.progressPercentage,
+      status: task.status,
+      stage: task.stage,
+      stageLabel: task.stageLabel,
+      bookId: task.bookId || task.book_id || null,
+      timestamp: new Date().toISOString(),
+    };
+    this.broadcastSSE('telemetry', telemetry);
+  }
+
+  broadcastQueueUpdate() {
+    try {
+      const queue = this.getQueueStatus();
+      this.broadcastSSE('queue', queue);
+    } catch (_) {}
+  }
+
+  addLog(taskId, message, level = 'info') {
+    const entry = {
+      id: this.logNextId++,
+      taskId: taskId || this.currentTaskId || null,
+      timestamp: new Date().toISOString(),
+      level,
+      message: String(message),
+    };
+
+    this.recentLogs.push(entry);
+    if (this.recentLogs.length > 250) {
+      this.recentLogs.shift();
+    }
+
+    if (entry.taskId) {
+      if (!this.taskLogs.has(entry.taskId)) {
+        this.taskLogs.set(entry.taskId, []);
+      }
+      const list = this.taskLogs.get(entry.taskId);
+      list.push(entry);
+      if (list.length > 250) {
+        list.shift();
+      }
+    }
+
+    this.broadcastSSE('log', entry);
+  }
+
+  getLogs(taskId = null, limit = 100) {
+    if (taskId && this.taskLogs.has(taskId)) {
+      return this.taskLogs.get(taskId).slice(-limit);
+    }
+    return this.recentLogs.slice(-limit);
   }
 
   get isProcessing() {
@@ -276,6 +413,7 @@ class ImportQueueService {
     }
 
     console.log(`[ImportQueue] Starting task ${nextTask.id} (${nextTask.type}: "${nextTask.source_title}") [active: ${this.isProcessingCount}/${maxParallel}]`);
+    this.addLog(nextTask.id, `Starting task: "${nextTask.source_title}" (${nextTask.type})`);
 
     let bookId = null;
 
@@ -739,6 +877,7 @@ class ImportQueueService {
       });
 
       console.log(`[ImportQueue] Completed task ${nextTask.id} successfully. Linked book: ${bookId}`);
+      this.addLog(nextTask.id, `Completed task successfully. Ready in library.`);
     } catch (err) {
       const isCancelled = this._isCancelled(nextTask.id) || (err.message && err.message.includes('cancelled'));
       const currentTask = importQueueRepository.getById(nextTask.id);
@@ -771,6 +910,7 @@ class ImportQueueService {
           completed_at: new Date().toISOString(),
         });
         console.log(`[ImportQueue] Task ${nextTask.id} marked as cancelled.`);
+        this.addLog(nextTask.id, `Task cancelled by user.`);
       } else {
         importQueueRepository.update(nextTask.id, {
           status: 'failed',
@@ -780,6 +920,7 @@ class ImportQueueService {
           completed_at: new Date().toISOString(),
         });
         console.error(`[ImportQueue] Task ${nextTask.id} failed:`, err.message);
+        this.addLog(nextTask.id, `Task failed: ${err.message || 'Unknown processing error'}`, 'error');
       }
     } finally {
       this.cancellationTokens.delete(nextTask.id);

@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Clock,
@@ -13,9 +14,11 @@ import {
   Globe,
   Layers,
   Sparkles,
+  Terminal,
+  ChevronDown,
 } from 'lucide-react';
 import { useImportQueueStore } from '../../store/useImportQueueStore';
-import { StageChecklist } from './StageChecklist';
+import { PipelineStepper } from './PipelineStepper';
 import { formatRelativeTime } from '../../lib/relativeTime';
 import { toast } from '../../store/useToastStore';
 import { apiClient } from '../../api/client';
@@ -37,7 +40,20 @@ export function QueueManager() {
     removeTask,
     clearCompleted,
     fetchQueue,
+    logs,
+    fetchLogs,
+    clearLogs,
   } = useImportQueueStore();
+
+  const [isLogsExpanded, setIsLogsExpanded] = useState(false);
+  const logsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll detailed logs container to bottom when new logs arrive
+  useEffect(() => {
+    if (isLogsExpanded && logsContainerRef.current) {
+      logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
+    }
+  }, [logs, isLogsExpanded]);
 
   const handleOpenBook = async (bookId: string, taskArg?: ImportTask) => {
     const task =
@@ -192,23 +208,88 @@ export function QueueManager() {
             </div>
           </div>
 
-          {/* Progress Bar + Stages Info */}
-          <div className="space-y-1.5">
-            <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-line">
-              <div
-                className="h-full bg-brand transition-all duration-300"
-                style={{ width: `${Math.max(5, activeTask.progress)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-caption text-ink-muted">
-              <span className="capitalize">Stage: {activeTask.stage}</span>
-              <span className="font-mono text-ink-muted">{activeTask.progress}%</span>
-            </div>
+          {/* Unified Grand Stepper UI */}
+          <div className="rounded-xl bg-surface/40 border border-line p-4">
+            <PipelineStepper task={activeTask} />
           </div>
 
-          {/* Active Task Stage Checklist */}
-          <div className="rounded-lg bg-surface/50 border border-line p-3">
-            <StageChecklist stages={activeTask.stages} isCompleted={activeTask.status === 'completed'} />
+          {/* Real-time Streaming Logs Section */}
+          <div className="rounded-lg border border-line bg-surface/30 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => {
+                const nextState = !isLogsExpanded;
+                setIsLogsExpanded(nextState);
+                if (nextState) void fetchLogs(activeTask.id);
+              }}
+              className="w-full px-4 py-2.5 flex items-center justify-between text-caption font-mono text-ink-muted hover:text-ink hover:bg-subtle/40 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Terminal className="w-3.5 h-3.5 text-violet-400" />
+                <span className="font-semibold text-ink">View Detailed Logs</span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] bg-subtle text-ink-muted">
+                  {logs.length} lines
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  LIVE
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-ink-muted text-micro">
+                <span>{isLogsExpanded ? 'Hide' : 'Expand'}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isLogsExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
+
+            {isLogsExpanded && (
+              <div className="border-t border-line/70 bg-zinc-950 p-3 space-y-2">
+                <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800 text-[11px] font-mono text-zinc-400">
+                  <span>Backend Terminal Stream</span>
+                  <button
+                    type="button"
+                    onClick={clearLogs}
+                    className="hover:text-zinc-200 text-zinc-500 transition-colors text-micro"
+                  >
+                    Clear Logs
+                  </button>
+                </div>
+                <div
+                  ref={logsContainerRef}
+                  className="max-h-60 overflow-y-auto space-y-1 font-mono text-xs text-zinc-300 pr-1 select-text"
+                >
+                  {logs.length === 0 ? (
+                    <p className="text-zinc-500 italic py-2 text-center text-caption">
+                      Waiting for ingestion telemetry logs…
+                    </p>
+                  ) : (
+                    logs.map((log) => (
+                      <div key={log.id} className="flex items-start gap-2 leading-relaxed">
+                        <span className="text-zinc-600 shrink-0 text-[10px] pt-0.5">
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                        </span>
+                        <span
+                          className={
+                            log.level === 'error'
+                              ? 'text-red-400'
+                              : log.level === 'warn'
+                              ? 'text-amber-400'
+                              : log.message.includes('[Pipeline]')
+                              ? 'text-violet-300 font-semibold'
+                              : 'text-zinc-300'
+                          }
+                        >
+                          {log.message}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Contextual reassurance notice */}

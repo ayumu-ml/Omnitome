@@ -13,6 +13,7 @@ import {
 import { Job, ImportTask } from '../../types/domain';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useImportQueueStore } from '../../store/useImportQueueStore';
+import { PipelineStepper } from './PipelineStepper';
 
 export interface ImportCinematicProps {
   task?: ImportTask | null;
@@ -31,13 +32,11 @@ interface StageDefinition {
 }
 
 const STAGES: StageDefinition[] = [
-  { key: 'preparing', label: 'Preparing', description: 'Validating format and source payload' },
-  { key: 'acquiring', label: 'Acquiring', description: 'Reading source streams and document headers' },
-  { key: 'extracting', label: 'Extracting', description: 'Recovering text, headings, and clean blocks' },
-  { key: 'structuring', label: 'Structuring', description: 'Detecting chapters, hierarchy, and sections' },
-  { key: 'indexing', label: 'Semantic Memory', description: 'Generating BGE-M3 vector embeddings', computational: true },
-  { key: 'synthesizing', label: 'Compression', description: 'Writing editorial thesis and omni chapters', computational: true },
-  { key: 'ready', label: 'Ready', description: 'Persisted to library and ready to read' },
+  { key: 'parsing', label: 'Parsing', description: 'Recovering text blocks, headings, and clean structure' },
+  { key: 'indexing', label: 'Indexing', description: 'Generating BGE-M3 vector embeddings for semantic recall', computational: true },
+  { key: 'classifying', label: 'Classifying', description: 'Determining content taxonomy, archetype, and reading level', computational: true },
+  { key: 'planning', label: 'Planning', description: 'Drafting chapter outlines, synopsis, and section bounds' },
+  { key: 'synthesizing', label: 'Synthesizing', description: 'Compressing chapters with loss-bounded provenance', computational: true },
 ];
 
 export function ImportCinematic({
@@ -77,15 +76,22 @@ export function ImportCinematic({
       const isCancelled = task.status === 'cancelled';
       const progress = isComplete ? 100 : Math.max(0, Math.min(100, task.progress));
 
-      let stageIdx = STAGES.findIndex((s) => s.key === task.stage);
-      if (stageIdx === -1) {
-        if (progress < 15) stageIdx = 0;
-        else if (progress < 30) stageIdx = 1;
-        else if (progress < 50) stageIdx = 2;
-        else if (progress < 70) stageIdx = 3;
-        else if (progress < 85) stageIdx = 4;
-        else if (progress < 100) stageIdx = 5;
-        else stageIdx = 6;
+      let stageIdx = 0;
+      if (typeof task.currentStage === 'number' && task.currentStage >= 1 && task.currentStage <= 5) {
+        stageIdx = task.currentStage - 1;
+      } else if (task.stage) {
+        const s = task.stage;
+        if (['synthesis', 'synthesizing', 'attribution', 'ready', 'done'].includes(s)) stageIdx = 4;
+        else if (['outline', 'synopsis', 'planning'].includes(s)) stageIdx = 3;
+        else if (['classify', 'classification'].includes(s)) stageIdx = 2;
+        else if (['semantic_index', 'indexing'].includes(s)) stageIdx = 1;
+        else stageIdx = 0;
+      } else {
+        if (progress < 25) stageIdx = 0;
+        else if (progress < 45) stageIdx = 1;
+        else if (progress < 60) stageIdx = 2;
+        else if (progress < 75) stageIdx = 3;
+        else stageIdx = 4;
       }
       if (isComplete) stageIdx = STAGES.length - 1;
 
@@ -119,14 +125,18 @@ export function ImportCinematic({
     let progress = activeJob ? activeJob.progress : isComplete ? 100 : 10;
     if (activeJob) {
       if (activeJob.type === 'INGEST' || activeJob.type === 'WEB_IMPORT') {
-        stageIdx = progress < 40 ? 1 : progress < 70 ? 2 : 3;
+        stageIdx = 0;
       } else if (activeJob.type === 'SEMANTIC_INDEX') {
+        stageIdx = 1;
+      } else if (activeJob.type === 'CLASSIFICATION') {
+        stageIdx = 2;
+      } else if (activeJob.type === 'SYNOPSIS' || activeJob.type === 'OUTLINE') {
+        stageIdx = 3;
+      } else if (activeJob.type === 'SYNTHESIS') {
         stageIdx = 4;
-      } else if (activeJob.type === 'SYNOPSIS' || activeJob.type === 'SYNTHESIS') {
-        stageIdx = 5;
       }
     } else if (isComplete) {
-      stageIdx = 6;
+      stageIdx = STAGES.length - 1;
     }
 
     return {
@@ -246,6 +256,20 @@ export function ImportCinematic({
         </div>
       </div>
 
+      {/* ── Unified Grand Stepper Timeline ── */}
+      <div className="p-4 bg-surface/50 rounded-xl border border-line">
+        <PipelineStepper
+          task={task}
+          jobs={jobs}
+          activeJob={activeJob}
+          currentStage={task?.currentStage}
+          stageName={task?.stageName}
+          progressPercentage={progress}
+          status={isComplete ? 'completed' : isFailed ? 'failed' : isCancelled ? 'cancelled' : 'processing'}
+          showProgressTrack={false}
+        />
+      </div>
+
       {/* ── Center Stage Visualizer ── */}
       <div className="min-h-[170px] flex items-center justify-center p-5 bg-surface/50 rounded-xl border border-line/70 overflow-hidden relative">
         {/* Error State */}
@@ -266,8 +290,8 @@ export function ImportCinematic({
           </div>
         ) : isComplete ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center py-2">
-            <div className="w-12 h-12 rounded-full bg-ok/15 text-ok flex items-center justify-center shadow-sm">
-              <Check className="w-6 h-6" aria-hidden="true" />
+            <div className="w-12 h-12 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center shadow-sm">
+              <Check className="w-6 h-6 stroke-[3]" aria-hidden="true" />
             </div>
             <div>
               <p className="font-display font-medium text-ink">Ready to explore</p>
@@ -284,8 +308,8 @@ export function ImportCinematic({
         ) : (
           /* Active Animated Stages */
           <>
-            {/* Stage: preparing & acquiring */}
-            {(currentStage.key === 'preparing' || currentStage.key === 'acquiring') && (
+            {/* Stage 0: Parsing */}
+            {currentStageIndex === 0 && (
               <div className="flex flex-col items-center justify-center gap-3">
                 <div className="relative w-28 h-20 bg-card rounded-lg border border-line shadow-xs flex items-center justify-center overflow-hidden">
                   <BookOpen className="w-8 h-8 text-ink-muted/40" />
@@ -293,30 +317,23 @@ export function ImportCinematic({
                     <div className="w-6 h-1 bg-brand/40 rounded-full" />
                   </div>
                 </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 bg-card border border-line rounded-md text-caption text-ink font-mono shadow-xs">
+                    § Parsing Blocks
+                  </span>
+                  <span className="px-2.5 py-1 bg-card border border-brand/40 rounded-md text-caption text-brand font-mono shadow-xs">
+                    § Structuring Outline
+                  </span>
+                </div>
                 <span className="text-caption text-ink-muted font-medium">Acquiring source material…</span>
               </div>
             )}
 
-            {/* Stage: extracting & structuring */}
-            {(currentStage.key === 'extracting' || currentStage.key === 'structuring') && (
-              <div className="flex flex-col items-center justify-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="px-2.5 py-1 bg-card border border-line rounded-md text-caption text-ink font-mono animate-chapter-card-in shadow-xs">
-                    § Parsing Blocks
-                  </div>
-                  <div className="px-2.5 py-1 bg-card border border-brand/40 rounded-md text-caption text-brand font-mono animate-chapter-card-in shadow-xs" style={{ animationDelay: '120ms' }}>
-                    § Structuring Outline
-                  </div>
-                </div>
-                <span className="text-caption text-ink-muted">Segmenting prose into canonical chapters…</span>
-              </div>
-            )}
-
-            {/* Stage: indexing (BGE-M3 Embeddings) */}
-            {currentStage.key === 'indexing' && (
+            {/* Stage 1: Indexing (BGE-M3 Embeddings) */}
+            {currentStageIndex === 1 && (
               <div className="relative w-36 h-36 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-full bg-brand/20 border border-brand text-brand flex items-center justify-center animate-pulse-dot-glow z-10 shadow-xs">
-                  <Cpu className="w-3.5 h-3.5 text-brand" />
+                <div className="w-7 h-7 rounded-full bg-brand/20 border border-brand text-brand flex items-center justify-center animate-pulse-dot-glow z-10 shadow-xs">
+                  <Cpu className="w-4 h-4 text-brand" />
                 </div>
                 {radialDots.map((dot) => {
                   if (dot.index >= visibleDotsCount) return null;
@@ -334,14 +351,40 @@ export function ImportCinematic({
               </div>
             )}
 
-            {/* Stage: synthesizing */}
-            {currentStage.key === 'synthesizing' && (
+            {/* Stage 2: Classifying */}
+            {currentStageIndex === 2 && (
               <div className="flex flex-col items-center justify-center gap-2.5 text-center">
-                <div className="w-10 h-10 rounded-full bg-brand/10 text-brand flex items-center justify-center animate-pulse">
+                <div className="w-10 h-10 rounded-full bg-violet-500/15 border border-violet-500/40 text-violet-400 flex items-center justify-center animate-pulse shadow-[0_0_16px_rgba(168,85,247,0.4)]">
+                  <Cpu className="w-5 h-5" />
+                </div>
+                <p className="text-caption text-ink font-medium">Classifying document taxonomy & archetype…</p>
+                <span className="text-micro text-ink-muted font-mono">Domain & Reading Level Calibration</span>
+              </div>
+            )}
+
+            {/* Stage 3: Planning */}
+            {currentStageIndex === 3 && (
+              <div className="flex flex-col items-center justify-center gap-2.5 text-center">
+                <div className="flex items-center gap-2">
+                  <div className="px-3 py-1 bg-card border border-violet-500/40 rounded-md text-caption text-violet-300 font-mono shadow-xs">
+                    § Editorial Blueprint
+                  </div>
+                  <div className="px-3 py-1 bg-card border border-line rounded-md text-caption text-ink-muted font-mono shadow-xs">
+                    § Chapter Allocations
+                  </div>
+                </div>
+                <p className="text-caption text-ink font-medium">Drafting outline & thesis targets…</p>
+              </div>
+            )}
+
+            {/* Stage 4: Synthesizing */}
+            {currentStageIndex === 4 && (
+              <div className="flex flex-col items-center justify-center gap-2.5 text-center">
+                <div className="w-10 h-10 rounded-full bg-violet-500/15 border border-violet-500/40 text-violet-400 flex items-center justify-center animate-pulse shadow-[0_0_18px_rgba(168,85,247,0.45)]">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <p className="text-caption text-ink font-medium">Generating editorial thesis & omni compression…</p>
-                <span className="text-micro text-ink-muted font-mono">BGE-M3 Grounded Context</span>
+                <span className="text-micro text-ink-muted font-mono">BGE-M3 Grounded Context & Provenance</span>
               </div>
             )}
           </>

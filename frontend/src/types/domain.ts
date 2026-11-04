@@ -55,6 +55,9 @@ export interface ImportTaskStage {
   completed_at?: string | null;
 }
 
+export type PipelineStageNumber = 1 | 2 | 3 | 4 | 5;
+export type PipelineStageName = 'Parsing' | 'Indexing' | 'Classifying' | 'Planning' | 'Synthesizing';
+
 export interface ImportTask {
   id: string;
   type: ImportTaskType;
@@ -64,6 +67,9 @@ export interface ImportTask {
   stage: ImportStageKey;
   stageLabel: string;
   progress: number;
+  currentStage: PipelineStageNumber;
+  stageName: PipelineStageName;
+  progressPercentage: number;
   queueOrder: number;
   bookId?: string | null;
   error?: string | null;
@@ -85,6 +91,12 @@ export interface RawImportTask {
   stage_label?: string;
   stageLabel?: string;
   progress?: number;
+  currentStage?: number;
+  current_stage?: number;
+  stageName?: string;
+  stage_name?: string;
+  progressPercentage?: number;
+  progress_percentage?: number;
   queue_order?: number;
   queueOrder?: number;
   book_id?: string | null;
@@ -171,6 +183,42 @@ export function normalizeImportTask(raw: RawImportTask): ImportTask {
     computedProgress = Math.max(rawProgress, STAGE_PROGRESS_MAP[taskStage]);
   }
 
+  // Extract or compute structured currentStage (1-5) and stageName
+  let currentStage: PipelineStageNumber = 1;
+  const rawStageNum = raw.currentStage ?? raw.current_stage;
+  if (typeof rawStageNum === 'number' && rawStageNum >= 1 && rawStageNum <= 5) {
+    currentStage = Math.round(rawStageNum) as PipelineStageNumber;
+  } else {
+    if (taskStatus === 'completed') {
+      currentStage = 5;
+    } else if (['synthesis', 'synthesizing', 'attribution', 'ready', 'done'].includes(taskStage)) {
+      currentStage = 5;
+    } else if (['outline', 'synopsis', 'planning'].includes(taskStage)) {
+      currentStage = 4;
+    } else if (['classify', 'classification'].includes(taskStage)) {
+      currentStage = 3;
+    } else if (['semantic_index', 'indexing'].includes(taskStage)) {
+      currentStage = 2;
+    } else {
+      currentStage = 1;
+    }
+  }
+
+  const STAGE_NAME_MAP: Record<PipelineStageNumber, PipelineStageName> = {
+    1: 'Parsing',
+    2: 'Indexing',
+    3: 'Classifying',
+    4: 'Planning',
+    5: 'Synthesizing',
+  };
+
+  const stageName: PipelineStageName =
+    ((raw.stageName || raw.stage_name) as PipelineStageName) || STAGE_NAME_MAP[currentStage] || 'Parsing';
+  const progressPercentage = Math.min(
+    100,
+    Math.max(0, Math.round(raw.progressPercentage ?? raw.progress_percentage ?? computedProgress))
+  );
+
   return {
     id: raw.id,
     type: (raw.type as ImportTaskType) || 'file',
@@ -180,6 +228,9 @@ export function normalizeImportTask(raw: RawImportTask): ImportTask {
     stage: taskStage,
     stageLabel: raw.stageLabel || raw.stage_label || 'Queued for processing',
     progress: Math.min(100, Math.max(0, Math.round(computedProgress))),
+    currentStage,
+    stageName,
+    progressPercentage,
     queueOrder: typeof (raw.queueOrder ?? raw.queue_order) === 'number' ? (raw.queueOrder ?? raw.queue_order)! : 0,
     bookId: raw.bookId || raw.book_id || null,
     error: raw.error || null,

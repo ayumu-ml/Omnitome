@@ -13,6 +13,14 @@ interface QueueApiResponse {
   pendingCount: number;
 }
 
+export interface ImportLogEntry {
+  id: string | number;
+  taskId?: string | null;
+  timestamp: string;
+  level?: string;
+  message: string;
+}
+
 interface ImportQueueState {
   activeTask: ImportTask | null;
   queuedTasks: ImportTask[];
@@ -28,9 +36,13 @@ interface ImportQueueState {
   hasActiveWork: boolean;
   etaSeconds: number | null;
   elapsedSeconds: number;
+  logs: ImportLogEntry[];
 
   // Actions
   fetchQueue: () => Promise<void>;
+  initSSE: () => void;
+  fetchLogs: (taskId?: string) => Promise<void>;
+  clearLogs: () => void;
   toggleDock: () => void;
   setDockExpanded: (val: boolean) => void;
   enqueueFiles: (files: File[], dossierId?: string, replace?: boolean) => Promise<ImportTask[]>;
@@ -93,6 +105,94 @@ const getStoredDockExpanded = (): boolean => {
 };
 
 let pollTimer: ReturnType<typeof setTimeout> | null = null;
+let sseSource: EventSource | null = null;
+let sseRetryTimer: ReturnType<typeof setTimeout> | null = null;
+
+function setupSSE(set: any, get: any) {
+  if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
+  if (sseSource && sseSource.readyState !== EventSource.CLOSED) return;
+
+  try {
+    const sseUrl = apiUrl('/api/import/queue/events');
+    const es = new EventSource(sseUrl);
+    sseSource = es;
+
+    es.addEventListener('telemetry', (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (!data || !data.taskId) return;
+        set((state: ImportQueueState) => {
+          if (state.activeTask && state.activeTask.id === data.taskId) {
+            const updatedActive: ImportTask = {
+              ...state.activeTask,
+              currentStage: data.currentStage ?? state.activeTask.currentStage,
+              stageName: data.stageName ?? state.activeTask.stageName,
+              progressPercentage: data.progressPercentage ?? state.activeTask.progressPercentage,
+              progress: data.progressPercentage ?? state.activeTask.progress,
+              status: data.status ?? state.activeTask.status,
+              stage: data.stage ?? state.activeTask.stage,
+              stageLabel: data.stageLabel ?? state.activeTask.stageLabel,
+            };
+            return { activeTask: updatedActive, hasActiveWork: true };
+          } else if (!state.activeTask && data.status !== 'completed') {
+            // Task active before fetchQueue finished - trigger immediate fetchQueue to sync full task
+            void get().fetchQueue();
+          }
+          return state;
+        });
+      } catch (err) {
+        console.warn('[useImportQueueStore] SSE telemetry parse error:', err);
+      }
+    });
+
+    es.addEventListener('queue', (e: MessageEvent) => {
+      try {
+        const queueData = JSON.parse(e.data);
+        if (queueData) {
+          if (queueData.active) {
+            const active = normalizeImportTask(queueData.active);
+            set({
+              activeTask: active,
+              pendingCount: (queueData.queued?.length || 0) + 1,
+              hasActiveWork: true,
+            });
+          }
+          void get().fetchQueue();
+        }
+      } catch (err) {
+        console.warn('[useImportQueueStore] SSE queue parse error:', err);
+      }
+    });
+
+    es.addEventListener('log', (e: MessageEvent) => {
+      try {
+        const log = JSON.parse(e.data);
+        if (!log || !log.message) return;
+        set((state: ImportQueueState) => {
+          if (state.logs.some((l) => l.id === log.id)) return state;
+          const next = [...state.logs, log];
+          if (next.length > 250) next.shift();
+          return { logs: next };
+        });
+      } catch (err) {
+        console.warn('[useImportQueueStore] SSE log parse error:', err);
+      }
+    });
+
+    es.onerror = () => {
+      try {
+        es.close();
+      } catch (_) {}
+      sseSource = null;
+      if (sseRetryTimer) clearTimeout(sseRetryTimer);
+      sseRetryTimer = setTimeout(() => {
+        setupSSE(set, get);
+      }, 5000);
+    };
+  } catch (err) {
+    console.warn('[useImportQueueStore] Failed to establish SSE connection:', err);
+  }
+}
 
 export const useImportQueueStore = create<ImportQueueState>((set, get) => {
   // Internal helper to calculate dynamic ETA (F77)
@@ -195,8 +295,37 @@ export const useImportQueueStore = create<ImportQueueState>((set, get) => {
     hasActiveWork: false,
     etaSeconds: null,
     elapsedSeconds: 0,
+    logs: [],
+
+    initSSE: () => setupSSE(set, get),
+
+    fetchLogs: async (taskId?: string) => {
+      try {
+        const url = taskId ? `/api/import/queue/${taskId}/logs` : '/api/import/queue/logs';
+        const res = await apiClient<{ success: boolean; logs: ImportLogEntry[] }>(url);
+        if (res && Array.isArray(res.logs)) {
+          set((state) => {
+            const merged = [...state.logs];
+            const seen = new Set(merged.map((l) => l.id));
+            for (const item of res.logs) {
+              if (!seen.has(item.id)) {
+                merged.push(item);
+                seen.add(item.id);
+              }
+            }
+            merged.sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+            return { logs: merged.slice(-250) };
+          });
+        }
+      } catch (err) {
+        console.warn('[useImportQueueStore] fetchLogs error:', err);
+      }
+    },
+
+    clearLogs: () => set({ logs: [] }),
 
     fetchQueue: async () => {
+      setupSSE(set, get);
       try {
         const res = await apiClient<QueueApiResponse>('/api/import/queue');
         const active = res.active ? normalizeImportTask(res.active) : null;

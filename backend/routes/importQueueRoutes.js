@@ -24,6 +24,91 @@ router.get('/', (req, res, next) => {
   }
 });
 
+// Helper for SSE connection
+function handleSSEStream(req, res) {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  if (typeof res.flushHeaders === 'function') {
+    res.flushHeaders();
+  }
+
+  res.write(': sse connected\n\n');
+
+  try {
+    const queue = importQueueService.getQueueStatus();
+    res.write(`event: queue\ndata: ${JSON.stringify(queue)}\n\n`);
+
+    if (queue.active) {
+      const telemetry = {
+        taskId: queue.active.id,
+        currentStage: queue.active.currentStage,
+        stageName: queue.active.stageName,
+        progressPercentage: queue.active.progressPercentage,
+        status: queue.active.status,
+        stage: queue.active.stage,
+        stageLabel: queue.active.stageLabel,
+        bookId: queue.active.bookId || queue.active.book_id || null,
+        timestamp: new Date().toISOString(),
+      };
+      res.write(`event: telemetry\ndata: ${JSON.stringify(telemetry)}\n\n`);
+    }
+
+    const recentLogs = importQueueService.getLogs(queue.active?.id || null, 50);
+    for (const log of recentLogs) {
+      res.write(`event: log\ndata: ${JSON.stringify(log)}\n\n`);
+    }
+  } catch (_) {}
+
+  importQueueService.addSSEClient(res);
+
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(': heartbeat\n\n');
+    } catch (_) {
+      clearInterval(heartbeat);
+    }
+  }, 15000);
+
+  const cleanup = () => {
+    clearInterval(heartbeat);
+    importQueueService.removeSSEClient(res);
+  };
+
+  req.on('close', cleanup);
+  req.on('error', cleanup);
+  res.on('close', cleanup);
+  res.on('error', cleanup);
+}
+
+// GET /api/import/queue/events (Server-Sent Events)
+router.get('/events', handleSSEStream);
+// GET /api/import/queue/stream (SSE alias)
+router.get('/stream', handleSSEStream);
+
+// GET /api/import/queue/logs - get recent queue logs
+router.get('/logs', (req, res, next) => {
+  try {
+    const logs = importQueueService.getLogs(null, 150);
+    res.json({ success: true, logs });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/import/queue/:id/logs - get logs for specific task
+router.get('/:id/logs', (req, res, next) => {
+  try {
+    const logs = importQueueService.getLogs(req.params.id, 150);
+    res.json({ success: true, logs });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/import/queue/:id - get single task by id
 router.get('/:id', (req, res, next) => {
   try {
