@@ -50,6 +50,9 @@ tmp-*.js
 query*.js
 patch*.js
 
+# Studio, video showcase, and marketing scratch assets
+_studio/
+
 
 backend/tests/fixtures/*.pdf
 backend/tests/fixtures/stress/*.pdf
