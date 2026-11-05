@@ -161,7 +161,7 @@ router.post('/:id/progress', (req, res, next) => {
 router.post('/:id/resynthesize', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { force = false } = req.body || {};
+    const { force = false, customInstruction } = req.body || {};
 
     const chapter = smartChapterRepository.getById(id);
     if (!chapter) {
@@ -177,7 +177,11 @@ router.post('/:id/resynthesize', async (req, res, next) => {
     }
 
     const synthesisService = require('../services/synthesis/synthesisService');
-    const result = await synthesisService.resynthesizeChapter(id, { force });
+    const result = await synthesisService.resynthesizeChapter(id, {
+      force,
+      customInstruction: typeof customInstruction === 'string' ? customInstruction.trim() : undefined,
+      resynthesis_source: customInstruction ? 'custom' : 'manual',
+    });
 
     return res.json({
       success: true,

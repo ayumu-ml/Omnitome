@@ -289,6 +289,7 @@ export default function App() {
               <Route path="/book/:bookId" element={<BookDetailsRoute />} />
               <Route path="/import" element={<ImportRoute />} />
               <Route path="/read/:bookId/:chapterId" element={<ReaderRoute />} />
+              <Route path="/reader/:bookId/:chapterId" element={<ReaderRoute />} />
               <Route path="/settings" element={<SettingsRoute />} />
               <Route path="/help" element={<HelpRoute />} />
             </Routes>

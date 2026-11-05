@@ -613,6 +613,93 @@ router.post('/:id/resynthesize', async (req, res, next) => {
   }
 });
 
+// POST /api/books/:bookId/chapters/:chapterId/resynthesize - Custom chapter re-synthesis with user style prompt
+router.post('/:bookId/chapters/:chapterId/resynthesize', async (req, res, next) => {
+  try {
+    const { bookId, chapterId } = req.params;
+    const { customInstruction } = req.body || {};
+
+    const db = getDatabase();
+    let book = null;
+    try {
+      book = bookService.getBook(bookId);
+    } catch (bErr) {
+      if (bErr.message && (bErr.message.includes('not found') || bErr.message.includes('was not found'))) {
+        return res.status(404).json({ error: `Book ${bookId} not found` });
+      }
+      throw bErr;
+    }
+    if (!book) {
+      return res.status(404).json({ error: `Book ${bookId} not found` });
+    }
+
+    // 1. Fetch smart chapter record
+    let smartChapter = smartChapterRepository.getById(chapterId);
+    if (!smartChapter || smartChapter.book_id !== bookId) {
+      const allSmart = smartChapterRepository.getByBookId(bookId);
+      smartChapter = allSmart.find(
+        (sc) =>
+          sc.id === chapterId ||
+          sc.id === `smart-${bookId}-ch-${chapterId}` ||
+          String(sc.sequence) === String(chapterId)
+      );
+      if (!smartChapter) {
+        const rawChapter = db.prepare('SELECT number FROM chapters WHERE id = ? AND book_id = ?').get(chapterId, bookId);
+        if (rawChapter) {
+          smartChapter = allSmart.find((sc) => sc.sequence === rawChapter.number);
+        }
+      }
+    }
+
+    if (!smartChapter) {
+      return res.status(404).json({ error: `Smart chapter not found for chapter ${chapterId} in book ${bookId}` });
+    }
+
+    if (smartChapter.status === 'generating') {
+      return res.status(409).json({ error: `Chapter ${smartChapter.id} is currently generating` });
+    }
+
+    // 2. Re-synthesize using exact mapped source_chunks and user's custom prompt
+    const synthesisService = require('../services/synthesis/synthesisService');
+    const result = await synthesisService.resynthesizeChapter(smartChapter.id, {
+      force: true,
+      customInstruction: typeof customInstruction === 'string' ? customInstruction.trim() : undefined,
+      resynthesis_source: 'custom',
+      awaitProvenance: true,
+    });
+
+    // 3. Run/ensure cross-encoder provenance verification on new output
+    const provenanceResolver = require('../services/semantic/provenanceResolver');
+    try {
+      await provenanceResolver.verifyRepresentation(smartChapter.id);
+    } catch (pvErr) {
+      console.warn(`[Resynthesize] Provenance verification warning for ${smartChapter.id}:`, pvErr.message);
+    }
+
+    // 4. Return updated smart_chapter record with attributions
+    const updated = smartChapterRepository.getById(smartChapter.id);
+    const attributionRepository = require('../repositories/attributionRepository');
+    const attributions = attributionRepository.getBySmartChapterId(smartChapter.id);
+
+    return res.json({
+      success: true,
+      smartChapter: {
+        ...updated,
+        attributions,
+      },
+      result,
+    });
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return res.status(404).json({ error: err.message });
+    }
+    if (err.statusCode === 409) {
+      return res.status(409).json({ error: err.message });
+    }
+    next(err);
+  }
+});
+
 // Single-Book Smart Reading / Editorial Endpoints
 const editorialService = require('../services/synthesis/editorialService');
 const synthesisService = require('../services/synthesis/synthesisService');

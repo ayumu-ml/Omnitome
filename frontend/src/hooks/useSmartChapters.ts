@@ -217,3 +217,43 @@ export function useResynthesizeSmartChapter(bookId?: string) {
     },
   });
 }
+
+export interface CustomResynthesisResponse {
+  success: boolean;
+  smartChapter: SmartChapter;
+  result?: any;
+}
+
+export function useCustomResynthesizeChapter(bookId?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CustomResynthesisResponse,
+    Error,
+    { chapterId: string; customInstruction?: string }
+  >({
+    mutationFn: async ({ chapterId, customInstruction }) => {
+      if (!bookId) throw new Error('Book ID is required for re-synthesis');
+      return apiClient<CustomResynthesisResponse>(`/api/books/${bookId}/chapters/${chapterId}/resynthesize`, {
+        method: 'POST',
+        body: JSON.stringify({ customInstruction: customInstruction || '' }),
+      });
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['smart-chapters', variables.chapterId] });
+      if (bookId) {
+        queryClient.invalidateQueries({ queryKey: ['smart-chapters', 'book', bookId] });
+        queryClient.invalidateQueries({ queryKey: ['resume-target', bookId] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['smart-chapters'] });
+        queryClient.invalidateQueries({ queryKey: ['resume-target'] });
+      }
+      queryClient.invalidateQueries({ queryKey: ['provenance', variables.chapterId] });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['book'] });
+      try {
+        window.dispatchEvent(new CustomEvent('omnitome:books-changed'));
+      } catch {}
+    },
+  });
+}

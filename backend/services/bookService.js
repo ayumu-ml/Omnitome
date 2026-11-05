@@ -954,6 +954,41 @@ class BookService {
       qualifiesForSynopsis: chapterEntities.length > 0,
     });
   }
+
+  async resynthesizeChapter(bookId, chapterId, options = {}) {
+    const synthesisService = require('./synthesis/synthesisService');
+    const smartChapterRepository = require('../repositories/smartChapterRepository');
+    const chapterRepository = require('../repositories/chapterRepository');
+
+    let smartChapter = smartChapterRepository.getById(chapterId);
+    if (!smartChapter || smartChapter.book_id !== bookId) {
+      const allSmart = smartChapterRepository.getByBookId(bookId);
+      smartChapter = allSmart.find(
+        (sc) =>
+          sc.id === chapterId ||
+          sc.id === `smart-${bookId}-ch-${chapterId}` ||
+          String(sc.sequence) === String(chapterId)
+      );
+      if (!smartChapter) {
+        const rawChapter = chapterRepository.getById(chapterId);
+        if (rawChapter) {
+          smartChapter = allSmart.find((sc) => sc.sequence === rawChapter.number);
+        }
+      }
+    }
+
+    if (!smartChapter) {
+      const err = new Error(`Smart chapter not found for chapter ${chapterId} in book ${bookId}`);
+      err.statusCode = 404;
+      throw err;
+    }
+
+    return await synthesisService.resynthesizeChapter(smartChapter.id, {
+      ...options,
+      force: true,
+      resynthesis_source: options.customInstruction ? 'custom' : (options.resynthesis_source || 'manual'),
+    });
+  }
 }
 
 const bookServiceInstance = new BookService();

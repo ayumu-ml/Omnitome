@@ -9,11 +9,13 @@ import {
   Sparkles,
   Maximize2,
   Minimize2,
+  Wand2,
 } from 'lucide-react';
 import {
   useSmartChapters,
   useSmartChapter,
   useUpdateSmartChapterProgress,
+  useCustomResynthesizeChapter,
 } from '../hooks/useSmartChapters';
 import { apiClient } from '../api/client';
 import {
@@ -28,6 +30,7 @@ import { ChapterNav } from '../components/reader/ChapterNav';
 import { ScrollProgress } from '../components/reader/ScrollProgress';
 import { EmptyState } from '../components/shared/EmptyState';
 import { ErrorBoundary } from '../components/shared/ErrorBoundary';
+import { Modal } from '../components/shared/Modal';
 import { useScrollDirection } from '../hooks/useScrollDirection';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { Chapter, ChapterRepresentation, CanonicalBlock } from '../types/domain';
@@ -254,7 +257,7 @@ function ReaderContent() {
     };
   }, [isGenerated, smartChapter?.id, smartChapter?.readAt, chapterId, updateProgress]);
 
-  // Restore scroll position when entering Smart mode if previously saved
+  // Auto-scroll to top on chapter change with restoration support (TASK 1)
   useEffect(() => {
     if (chapterId) {
       const scrollKey = `smart_scroll_${chapterId}`;
@@ -269,6 +272,7 @@ function ReaderContent() {
           return () => clearTimeout(timer);
         }
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [chapterId]);
 
@@ -361,6 +365,50 @@ function ReaderContent() {
 
   const handleNavigate = (newChapterId: string) => {
     navigate(`/read/${bookId}/${newChapterId}`);
+  };
+
+  // Custom Re-synthesis state & mutation (TASK 3)
+  const customResynthesize = useCustomResynthesizeChapter(bookId);
+  const [isResynthesizeModalOpen, setIsResynthesizeModalOpen] = useState(false);
+  const [customInstruction, setCustomInstruction] = useState('');
+
+  const handleCustomResynthesize = async () => {
+    if (!smartChapter || customResynthesize.isPending) return;
+    try {
+      await customResynthesize.mutateAsync({
+        chapterId: smartChapter.id,
+        customInstruction: customInstruction.trim() || undefined,
+      });
+      setIsResynthesizeModalOpen(false);
+      refetchSmartChapter();
+      refetchSmartList();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('[ReaderRoute] Custom re-synthesis failed:', err);
+    }
+  };
+
+  // Chapter Jump state & handler (TASK 2)
+  const [jumpInput, setJumpInput] = useState('');
+
+  const handleJumpSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const rawVal = jumpInput.trim();
+    if (!rawVal) return;
+    const parsed = parseInt(rawVal, 10);
+    if (isNaN(parsed) || smartChapters.length === 0) {
+      setJumpInput('');
+      return;
+    }
+    const clamped = Math.max(1, Math.min(parsed, smartChapters.length));
+    const target =
+      smartChapters.find((c) => c.sequence === clamped) ||
+      smartChapters[clamped - 1];
+
+    if (target) {
+      handleNavigate(target.id);
+      setJumpInput('');
+    }
   };
 
   // Keyboard navigation across smart chapters
@@ -514,18 +562,62 @@ function ReaderContent() {
 
       {/* Main Reading Canvas */}
       <div className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-24">
-        {/* Top bar with Back Link, Fullscreen Toggle, and Mark as read */}
-        <div className="flex items-center justify-between py-2 mb-6 border-b border-line/60">
-          <button
-            type="button"
-            onClick={() => navigate(`/book/${bookId}`)}
-            className="inline-flex items-center gap-1 text-caption text-ink-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Book details</span>
-          </button>
+        {/* Top bar with Back Link, Jump to Chapter, Resynthesize, Fullscreen Toggle, and Mark as read */}
+        <div className="flex flex-wrap items-center justify-between gap-3 py-2 mb-6 border-b border-line/60">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(`/book/${bookId}`)}
+              className="inline-flex items-center gap-1 text-caption text-ink-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Book details</span>
+            </button>
+
+            {/* Jump to # Input (TASK 2) */}
+            {smartChapters.length > 0 && (
+              <form
+                onSubmit={handleJumpSubmit}
+                className="flex items-center gap-1.5"
+                role="search"
+                aria-label="Jump to chapter"
+              >
+                <label htmlFor="jump-to-chapter" className="text-caption text-ink-muted whitespace-nowrap">
+                  Jump to #:
+                </label>
+                <input
+                  id="jump-to-chapter"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={jumpInput}
+                  onChange={(e) => setJumpInput(e.target.value)}
+                  placeholder={`1-${smartChapters.length}`}
+                  className="w-16 px-2 py-0.5 text-caption font-mono rounded border border-[rgb(var(--line))] bg-surface text-ink placeholder:text-ink-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all text-center"
+                  aria-label="Chapter number to jump to"
+                />
+              </form>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
+            {/* Custom Re-synthesize Button (TASK 3) */}
+            {smartChapter && (
+              <button
+                type="button"
+                disabled={customResynthesize.isPending || smartStatus === 'generating'}
+                onClick={() => setIsResynthesizeModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-caption font-medium rounded-md border border-[rgb(var(--line))] text-[rgb(var(--ink-muted))] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent cursor-pointer disabled:opacity-50"
+                title="Re-synthesize chapter with custom instructions"
+                aria-label="Re-synthesize chapter"
+              >
+                <Wand2 className={`w-3.5 h-3.5 ${customResynthesize.isPending ? 'animate-spin' : ''}`} aria-hidden="true" />
+                <span className="hidden sm:inline">
+                  {customResynthesize.isPending ? 'Re-synthesizing…' : 'Re-synthesize'}
+                </span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={toggleFullscreen}
@@ -578,6 +670,14 @@ function ReaderContent() {
             )}
           </div>
         </div>
+
+        {/* Re-synthesis in flight banner */}
+        {customResynthesize.isPending && (
+          <div className="mb-6 p-3 rounded-md bg-accent/10 border border-accent/30 flex items-center gap-2.5 text-caption text-ink animate-pulse">
+            <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
+            <span>Re-synthesizing chapter with custom instructions (preserving ground truth citations)…</span>
+          </div>
+        )}
 
         {/* Content Area */}
         {isLoading || !chapterForReader ? (
@@ -642,6 +742,68 @@ function ReaderContent() {
           />
         </div>
       )}
+
+      {/* Custom Re-synthesis Modal (TASK 3) */}
+      <Modal
+        open={isResynthesizeModalOpen}
+        onClose={() => setIsResynthesizeModalOpen(false)}
+        title={`Re-synthesize Chapter ${smartChapter?.sequence ?? ''}`}
+        description="Re-compress this chapter from its exact source material with custom style or focus instructions."
+        size="md"
+        footer={
+          <>
+            <button
+              type="button"
+              disabled={customResynthesize.isPending}
+              onClick={() => setIsResynthesizeModalOpen(false)}
+              className="px-3.5 py-1.5 text-caption font-medium rounded-md border border-line text-ink-muted hover:text-ink hover:bg-subtle transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={customResynthesize.isPending}
+              onClick={handleCustomResynthesize}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-caption font-medium rounded-md bg-brand text-white hover:opacity-90 disabled:opacity-50 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              {customResynthesize.isPending ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Re-synthesizing…</span>
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Re-synthesize</span>
+                </>
+              )}
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-3">
+          <label htmlFor="custom-resynthesis-prompt" className="block text-ui-sm font-medium text-ink">
+            Custom Synthesis Instructions (Optional)
+          </label>
+          <textarea
+            id="custom-resynthesis-prompt"
+            rows={4}
+            value={customInstruction}
+            onChange={(e) => setCustomInstruction(e.target.value)}
+            disabled={customResynthesize.isPending}
+            placeholder="e.g., Make this more readable, use bullet points for lists, highlight the formulas."
+            className="w-full px-3 py-2 text-ui-sm rounded-md border border-[rgb(var(--line))] bg-surface text-ink placeholder:text-ink-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60 transition-all resize-y"
+          />
+          <p className="text-caption text-ink-muted">
+            Omnitome will apply your custom instructions while strictly preserving ground truth provenance, citations, and compression bounds from the original source chunks.
+          </p>
+          {customResynthesize.isError && (
+            <div className="p-2.5 rounded bg-err/10 border border-err/30 text-err text-caption">
+              {customResynthesize.error?.message || 'Failed to re-synthesize chapter. Please try again.'}
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

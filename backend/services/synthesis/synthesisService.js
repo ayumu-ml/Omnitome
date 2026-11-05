@@ -219,7 +219,7 @@ class SynthesisService {
     try {
       return await this._executeSynthesizeChapter(outline, chapterObj, targetSmartId, {
         ...options,
-        resynthesis_source: 'manual',
+        resynthesis_source: options.resynthesis_source || 'manual',
       });
     } catch (err) {
       const existing = smartChapterRepository.getById(targetSmartId);
@@ -369,6 +369,10 @@ ${sourceMaterial}`;
     const hardCeiling = 500;
     const ratio = (N > 0 && assessedTargetWords > 0) ? (N / assessedTargetWords).toFixed(1) : '7.0';
 
+    const customPromptPart = (options.customInstruction && typeof options.customInstruction === 'string' && options.customInstruction.trim())
+      ? `\n\nUSER CUSTOM INSTRUCTIONS:\n${options.customInstruction.trim()}\n(Strict Invariant: Follow these user style/focus instructions while strictly adhering to all word bounds, factual ground truth, citation markers, and compression rules above.)`
+      : '';
+
     const compressionPrompt = `You are compressing a source text, not summarizing or synthesizing it.
 
 INPUT: ${N} source words across ${K} chunks.
@@ -389,7 +393,7 @@ Rules:
 - Do not add narrative framing, introductions, meta-commentary, transitions, or conclusions not present in the source. Begin directly with dense factual statements.
 - Every sentence must cite its source chunk at the end: [Source N].
 - Structure the output as 3–5 paragraphs separated by blank lines. Each paragraph covers one coherent movement of the source. Do not emit as a single block.
-- Final enforcement: count your own words. The 500-word ceiling includes all citation markers. If you would exceed 500 words, cut from the middle, not the end. The last sentence must be complete.
+- Final enforcement: count your own words. The 500-word ceiling includes all citation markers. If you would exceed 500 words, cut from the middle, not the end. The last sentence must be complete.${customPromptPart}
 
 SOURCE MATERIAL:
 ${sourceMaterial}
@@ -429,7 +433,7 @@ OUTPUT:`;
               : '';
             return `Your previous attempt produced ${wordCount} words. ${draftSection}Condense this draft into 250–360 words without losing specificity. Preserve the strongest examples and all named entities. Cut lower-value content first, not specific facts.
 Return only the condensed output, starting with [TITLE: ...].
-The 500-word ceiling strictly includes all [Source N] citation markers. Do not exceed ${bounds.hardCeiling} total words under any circumstances.
+The 500-word ceiling strictly includes all [Source N] citation markers. Do not exceed ${bounds.hardCeiling} total words under any circumstances.${customPromptPart}
 
 Rules:
 - The very first line of your output MUST be: [TITLE: <short chapter title>] followed by a blank line.
@@ -774,6 +778,7 @@ OUTPUT:`;
       truncated,
       finish_reason: finishReason,
       resynthesis_attempts: resynthesisAttempts,
+      ...(options.customInstruction ? { custom_instruction: options.customInstruction } : {}),
       ...(options.resynthesis_source ? { resynthesis_source: options.resynthesis_source } : {}),
       ...(violation_type ? { violation_type } : {}),
       ...(insufficientMarker ? { insufficient_marker: insufficientMarker } : {}),
@@ -850,18 +855,27 @@ OUTPUT:`;
       // to provenanceResolver.verifyRepresentation prevents this from racing
       // the book-wide trigger fired by the auto-import path.
       //
-      // Non-blocking: we do NOT await. Verification failure must never fail
-      // synthesis. Errors are logged and swallowed.
+      // For custom resynthesis (options.resynthesis_source === 'custom' or options.awaitProvenance),
+      // we await verification so full paragraph attributions are ready immediately on response.
       try {
         const provenanceResolver = require('../semantic/provenanceResolver');
-        provenanceResolver
-          .verifyRepresentation(targetSmartId)
-          .catch((pvErr) => {
+        if (options.resynthesis_source === 'custom' || options.awaitProvenance) {
+          await provenanceResolver.verifyRepresentation(targetSmartId).catch((pvErr) => {
             console.warn(
               `[SynthesisService] Post-synthesis provenance trigger failed for ${targetSmartId}:`,
               pvErr.message
             );
           });
+        } else {
+          provenanceResolver
+            .verifyRepresentation(targetSmartId)
+            .catch((pvErr) => {
+              console.warn(
+                `[SynthesisService] Post-synthesis provenance trigger failed for ${targetSmartId}:`,
+                pvErr.message
+              );
+            });
+        }
       } catch (pvErr) {
         console.warn(
           `[SynthesisService] Could not load provenanceResolver for ${targetSmartId}:`,
