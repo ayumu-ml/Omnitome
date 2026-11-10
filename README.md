@@ -4,6 +4,8 @@
 
 <h1 align="center">Omnitome</h1>
 
+### 🎬 [Watch the 3-Minute Showcase Video](https://youtu.be/Nmb-qiZpnrk)
+
 <p align="center">
   <strong>A Local-First Neural Reading System with Loss-Bounded Semantic Compression, Deterministic Vector Provenance, and On-Device Speech Synthesis.</strong>
 </p>
@@ -34,7 +36,7 @@
   <a href="https://github.com/ayumu-ml/Omnitome/releases/latest">
     <img src="https://img.shields.io/badge/Release_Notes-v1.1.1_Latest-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Release Notes" />
   </a>
-  <a href="https://github.com/ayumu-ml/Omnitome/releases/latest">
+  <a href="https://youtu.be/Nmb-qiZpnrk">
     <img src="https://img.shields.io/badge/🎬_Watch_Demo-3:44_Master_Walkthrough-E0245E?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo" />
   </a>
 </p>
@@ -60,7 +62,7 @@
 
 Omnitome combines **loss-bounded semantic compression (~7:1)** with **100% deterministic attribution**. Experience the core reading workflows below:
 
-> 📺 **Prefer video walkthrough?** Watch the complete **[3:44 Master Walkthrough Video with Gemini Kore Voiceover & Futuristic Soundtrack](https://github.com/ayumu-ml/Omnitome/releases/latest)** (available under the [Latest Release](https://github.com/ayumu-ml/Omnitome/releases/latest)), or check the compact [60-Second Demo (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4).
+> 📺 **Prefer video walkthrough?** Watch the complete **[3:44 Master Walkthrough Video on YouTube](https://youtu.be/Nmb-qiZpnrk)**, or check the compact [60-Second Demo (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4).
 
 ---
 
