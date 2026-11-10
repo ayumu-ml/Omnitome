@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="License: AGPL-3.0" /></a>
-  <img src="https://img.shields.io/badge/Release-v1.1.0%20Stable-0052CC" alt="Release: v1.1.0 Stable" />
+  <img src="https://img.shields.io/badge/Release-v1.1.1%20Stable-0052CC" alt="Release: v1.1.1 Stable" />
   <img src="https://img.shields.io/badge/Platform-Windows%20x64%20(Native%20Tier%201)-lightgrey" alt="Platform: Windows x64" />
   <img src="https://img.shields.io/badge/Tauri-v2.0%20(Rust)-FFC131?logo=tauri&logoColor=black" alt="Tauri v2" />
   <img src="https://img.shields.io/badge/Orchestrator-Node.js%2022%20LTS-339933?logo=node.js&logoColor=white" alt="Node.js 22 LTS" />
@@ -28,14 +28,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe">
-    <img src="https://img.shields.io/badge/⚡_Download_Omnitome_v1.1.0-Windows_x64_(1.95_GB)-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Omnitome v1.1.0 for Windows" />
+  <a href="https://github.com/ayumu-ml/Omnitome/releases/latest">
+    <img src="https://img.shields.io/badge/⚡_Download_Omnitome_v1.1.1-Windows_x64_(1.95_GB)-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Omnitome v1.1.1 for Windows" />
   </a>
-  <a href="https://github.com/ayumu-ml/Omnitome/releases/tag/v1.1.0">
-    <img src="https://img.shields.io/badge/Release_Notes-v1.1.0_Welcome_Wizard-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Release Notes" />
+  <a href="https://github.com/ayumu-ml/Omnitome/releases/latest">
+    <img src="https://img.shields.io/badge/Release_Notes-v1.1.1_Latest-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Release Notes" />
   </a>
-  <a href="https://github.com/ayumu-ml/Omnitome/blob/main/assets/omnitome_demo_60s.mp4">
-    <img src="https://img.shields.io/badge/🎬_Watch_Demo-60s_Overview-E0245E?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo" />
+  <a href="https://github.com/ayumu-ml/Omnitome/releases/latest">
+    <img src="https://img.shields.io/badge/🎬_Watch_Demo-3:44_Master_Walkthrough-E0245E?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Demo" />
   </a>
 </p>
 
@@ -60,7 +60,7 @@
 
 Omnitome combines **loss-bounded semantic compression (~7:1)** with **100% deterministic attribution**. Experience the core reading workflows below:
 
-> 📺 **Prefer audio narration?** You can still watch or download the complete [60-Second Master Demo Video with Kokoro-82M Voiceover (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4) or inspect the [video file directly on GitHub](https://github.com/ayumu-ml/Omnitome/blob/main/assets/omnitome_demo_60s.mp4).
+> 📺 **Prefer video walkthrough?** Watch the complete **[3:44 Master Walkthrough Video with Gemini Kore Voiceover & Futuristic Soundtrack](https://github.com/ayumu-ml/Omnitome/releases/latest)** (available under the [Latest Release](https://github.com/ayumu-ml/Omnitome/releases/latest)), or check the compact [60-Second Demo (`assets/omnitome_demo_60s.mp4`)](assets/omnitome_demo_60s.mp4).
 
 ---
 
@@ -151,20 +151,16 @@ You don't need a PhD in machine learning or hours of terminal setup to start usi
 ```text
 ┌─────────────────────────────────┐     ┌─────────────────────────────────┐     ┌─────────────────────────────────┐
 │       1. Download & Install     │     │       2. Three-Click Setup      │     │       3. Drop & Read            │
-│  Grab Omnitome_1.1.0_x64.exe    │ ──► │  Welcome Wizard auto-detects    │ ──► │  Drag in any book or document.  │
+│  Grab Omnitome_1.1.1_x64.exe    │ ──► │  Welcome Wizard auto-detects    │ ──► │  Drag in any book or document.  │
 │  from GitHub Releases (~1.9GB). │     │  Ollama, LM Studio, or Cloud.   │     │  Read compressed with citations!│
 └─────────────────────────────────┘     └─────────────────────────────────┘     └─────────────────────────────────┘
 ```
 
-1. **Download the Windows Installer:**
-   - Grab [Omnitome_1.1.0_x64-setup.exe](https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe) from GitHub Releases.
-   - Run the installer. All neural models (BGE-M3, BGE Reranker v2, Kokoro TTS) are bundled offline.
-2. **Launch & Choose Your LLM:**
-   - On first launch, the **Welcome Wizard** guides you:
-     - **Local Option:** Select [Ollama](https://ollama.ai/) or [LM Studio](https://lmstudio.ai/) for 100% offline, zero-cloud compression.
-     - **Cloud Option:** Paste an OpenRouter or Google Gemini key if you prefer ultra-fast cloud synthesis.
-3. **Drop in a Book:**
-   - Drag any PDF, EPUB, or document into the dropzone. Omnitome indexes it in seconds and opens your personalized, citation-backed reading lens!
+### Quick Start (Windows x64)
+
+1. Download the latest installer from the [v1.1.1 Release](https://github.com/ayumu-ml/Omnitome/releases/latest).
+2. **Note:** This is an open-source community build and is not code-signed. Windows SmartScreen may show a warning — click **"More info" → "Run anyway"**.
+3. Launch Omnitome and complete the Welcome Wizard.
 
 ---
 
@@ -640,8 +636,8 @@ Omnitome ships as a self-contained Windows desktop installer with zero manual Py
 
 | Resource | Direct Link | File Info |
 | :--- | :--- | :--- |
-| **Direct Binary Download** | **[Download Omnitome v1.1.0 for Windows (64-bit Installer)](https://github.com/ayumu-ml/Omnitome/releases/download/v1.1.0/Omnitome_1.1.0_x64-setup.exe)** | `Omnitome_1.1.0_x64-setup.exe` (~1.95 GB) |
-| **Release & Changelog** | **[GitHub Release v1.1.0 — Welcome Wizard & Synthetic Archive](https://github.com/ayumu-ml/Omnitome/releases/tag/v1.1.0)** | Release notes, asset tags & checksums |
+| **Direct Binary Download** | **[Download Omnitome v1.1.1 for Windows (64-bit Installer)](https://github.com/ayumu-ml/Omnitome/releases/latest)** | `Omnitome_1.1.1_x64-setup.exe` (~1.95 GB) |
+| **Release & Changelog** | **[GitHub Release v1.1.1 — Latest](https://github.com/ayumu-ml/Omnitome/releases/latest)** | Release notes, asset tags & checksums |
 
 - **Zero-Config Self-Contained Runtime:** Pre-bundles the Python 3.10 runtime, PyTorch FP16 CUDA/cuDNN binaries, Kokoro-82M neural TTS model, and Node.js 22 LTS orchestrator.
 - **Isolated Deployment:** Extracts cleanly into `%LOCALAPPDATA%\Omnitome` on first launch without polluting system PATHs.
@@ -651,7 +647,7 @@ Omnitome ships as a self-contained Windows desktop installer with zero manual Py
 > **To install:** Click **"More info"** and then select **"Run anyway"**.  
 > You can independently verify the cryptographic integrity of the installer in PowerShell prior to execution:
 > ```powershell
-> Get-FileHash -Algorithm SHA256 .\Omnitome_1.1.0_x64-setup.exe
+> Get-FileHash -Algorithm SHA256 .\Omnitome_1.1.1_x64-setup.exe
 > ```
 
 ---
@@ -733,7 +729,7 @@ This automated pipeline performs:
 3. Production backend staging (`resources/backend-runtime`) with pruned dev dependencies
 4. Portable standalone Node.js staging (`resources/node/node.exe`)
 5. Invoking `tauri build` to compile the final NSIS setup executable at:  
-   `src-tauri/target/release/bundle/nsis/Omnitome_1.1.0_x64-setup.exe`
+   `src-tauri/target/release/bundle/nsis/Omnitome_1.1.1_x64-setup.exe`
 
 ---
 
@@ -788,7 +784,7 @@ If you utilize Omnitome's architecture, loss-bounded semantic compression contra
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/ayumu-ml/Omnitome}},
-  version = {1.1.0}
+  version = {1.1.1}
 }
 ```
 
